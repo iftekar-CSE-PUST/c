@@ -1,4 +1,3 @@
-<!DOCTYPE html>
 <html lang="en">
 <head>
     <meta charset="UTF-8">
@@ -974,8 +973,8 @@
             width: 160px;
         }
 
-        /* Exam Schedule Modal Styles */
-        .exam-schedule-modal,
+        /* Announcement Modal Styles */
+        .announcement-modal,
         .privacy-modal,
         .terms-modal,
         .contact-modal {
@@ -993,13 +992,13 @@
             backdrop-filter: blur(10px);
         }
 
-        .exam-schedule-content,
+        .announcement-content,
         .privacy-content,
         .terms-content,
         .contact-content {
             background: linear-gradient(135deg, #1a3a8f, #2d5cc2);
             border-radius: 25px;
-            max-width: 1000px;
+            max-width: 1100px;
             width: 95%;
             max-height: 90vh;
             overflow-y: auto;
@@ -1021,19 +1020,19 @@
             background: linear-gradient(135deg, #006266, #009432);
         }
 
-        .exam-modal-header,
+        .announcement-modal-header,
         .privacy-modal-header,
         .terms-modal-header,
         .contact-modal-header {
             padding: 25px 30px;
             background: rgba(0, 0, 0, 0.2);
-            border-bottom: 1px solid rgba(255, 255, 255, 0.1);
+            border-bottom: 1px solid rgba(255, 255,255, 0.1);
             display: flex;
             justify-content: space-between;
             align-items: center;
         }
 
-        .exam-modal-header h2,
+        .announcement-modal-header h2,
         .privacy-modal-header h2,
         .terms-modal-header h2,
         .contact-modal-header h2 {
@@ -1044,7 +1043,7 @@
             gap: 15px;
         }
 
-        .exam-modal-header h2 i {
+        .announcement-modal-header h2 i {
             color: #f1c40f;
         }
 
@@ -1060,7 +1059,7 @@
             color: #2ecc71;
         }
 
-        .close-exam-schedule,
+        .close-announcement,
         .close-privacy,
         .close-terms,
         .close-contact {
@@ -1078,7 +1077,7 @@
             transition: all 0.3s ease;
         }
 
-        .close-exam-schedule:hover,
+        .close-announcement:hover,
         .close-privacy:hover,
         .close-terms:hover,
         .close-contact:hover {
@@ -1086,7 +1085,7 @@
             transform: rotate(90deg);
         }
 
-        .exam-modal-body,
+        .announcement-modal-body,
         .privacy-modal-body,
         .terms-modal-body,
         .contact-modal-body {
@@ -1112,7 +1111,7 @@
             line-height: 1.6;
         }
 
-        .exam-info-box {
+        .announcement-info-box {
             background: rgba(255, 255, 255, 0.1);
             border-radius: 15px;
             padding: 20px;
@@ -1120,80 +1119,33 @@
             border-left: 5px solid #f1c40f;
         }
 
-        .exam-info-box h4 {
+        .announcement-info-box h4 {
             margin-top: 0;
             margin-bottom: 15px;
             color: #f1c40f;
             font-size: 1.3em;
         }
 
-        .exam-table-container {
+        .announcement-image-container {
             overflow-x: auto;
             margin-bottom: 30px;
             border-radius: 15px;
             border: 1px solid rgba(255, 255, 255, 0.1);
             background: rgba(0, 0, 0, 0.2);
+            text-align: center;
+            padding: 20px;
         }
 
-        .exam-table {
-            width: 100%;
-            border-collapse: collapse;
-            min-width: 800px;
+        .announcement-image {
+            max-width: 100%;
+            height: auto;
+            border-radius: 10px;
+            box-shadow: 0 10px 30px rgba(0, 0, 0, 0.5);
+            display: block;
+            margin: 0 auto;
         }
 
-        .exam-table thead {
-            background: rgba(0, 0, 0, 0.4);
-        }
-
-        .exam-table th {
-            padding: 18px 15px;
-            text-align: left;
-            font-weight: 600;
-            font-size: 1.05rem;
-            border-bottom: 2px solid rgba(255, 255, 255, 0.2);
-        }
-
-        .exam-table tbody tr {
-            border-bottom: 1px solid rgba(255, 255, 255, 0.05);
-            transition: background-color 0.2s;
-        }
-
-        .exam-table tbody tr:hover {
-            background: rgba(255, 255, 255, 0.05);
-        }
-
-        .exam-table tbody tr:nth-child(even) {
-            background: rgba(0, 0, 0, 0.1);
-        }
-
-        .exam-table tbody tr:nth-child(even):hover {
-            background: rgba(255, 255, 255, 0.08);
-        }
-
-        .exam-table td {
-            padding: 16px 15px;
-            font-size: 1rem;
-        }
-
-        .course-code-cell {
-            font-weight: 600;
-            color: #f1c40f;
-        }
-
-        .time-cell {
-            font-weight: 600;
-            color: #48dbfb;
-        }
-
-        .viva-voce-row {
-            background: rgba(52, 152, 219, 0.15) !important;
-        }
-
-        .viva-voce-row .course-code-cell {
-            color: #48dbfb;
-        }
-
-        .exam-notice {
+        .announcement-notice {
             background: rgba(231, 76, 60, 0.15);
             border-radius: 15px;
             padding: 20px;
@@ -1201,13 +1153,13 @@
             border-left: 5px solid #e74c3c;
         }
 
-        .exam-notice p {
+        .announcement-notice p {
             margin: 0;
             font-size: 1.05em;
             line-height: 1.6;
         }
 
-        .exam-footer {
+        .announcement-footer {
             margin-top: 30px;
             padding-top: 20px;
             border-top: 1px solid rgba(255, 255, 255, 0.1);
@@ -1388,31 +1340,29 @@
                 font-size: 0.9em;
             }
 
-            .exam-schedule-content,
+            .announcement-content,
             .privacy-content,
             .terms-content,
             .contact-content {
                 padding: 15px;
             }
 
-            .exam-modal-header,
+            .announcement-modal-header,
             .privacy-modal-header,
             .terms-modal-header,
             .contact-modal-header {
                 padding: 20px;
             }
 
-            .exam-modal-header h2,
+            .announcement-modal-header h2,
             .privacy-modal-header h2,
             .terms-modal-header h2,
             .contact-modal-header h2 {
                 font-size: 1.5em;
             }
 
-            .exam-table th,
-            .exam-table td {
-                padding: 12px 10px;
-                font-size: 0.9em;
+            .announcement-image-container {
+                padding: 10px;
             }
 
             .footer-links {
@@ -1514,8 +1464,8 @@
                     <a href="https://pust.ac.bd/academic/departments/dept_teachers/D01" target="_blank" class="action-btn">
                         <i class="fas fa-chalkboard-teacher"></i> Teachers Zone
                     </a>
-                    <button class="action-btn" id="examScheduleBtn">
-                        <i class="fas fa-calendar-alt"></i> Exam Schedule
+                    <button class="action-btn" id="announcementBtn">
+                        <i class="fas fa-bullhorn"></i> Announcement
                     </button>
                 </div>
                 
@@ -1551,17 +1501,17 @@
             <span id="toast-text"></span>
         </div>
 
-        <!-- Exam Schedule Modal -->
-        <div id="examScheduleModal" class="exam-schedule-modal">
-            <div class="exam-schedule-content">
-                <div class="exam-modal-header">
-                    <h2><i class="fas fa-calendar-alt"></i> 1st Semester Exam Schedule 2025</h2>
-                    <button class="close-exam-schedule" id="closeExamSchedule">
+        <!-- Announcement Modal -->
+        <div id="announcementModal" class="announcement-modal">
+            <div class="announcement-content">
+                <div class="announcement-modal-header">
+                    <h2><i class="fas fa-bullhorn"></i> Important Announcement</h2>
+                    <button class="close-announcement" id="closeAnnouncement">
                         <i class="fas fa-times"></i>
                     </button>
                 </div>
                 
-                <div class="exam-modal-body">
+                <div class="announcement-modal-body">
                     <div class="university-header">
                         <h3>Department of Computer Science and Engineering</h3>
                         <p>Pabna University of Science and Technology<br>
@@ -1570,73 +1520,21 @@
                         <p style="margin-top: 15px;"></p>
                     </div>
                     
-                    <div class="exam-info-box">
+                    <div class="announcement-info-box">
                         <h4>B. Sc Engineering 1<sup>st</sup> Year 1<sup>st</sup> Semester Examination-2025</h4>
                         <p><strong>Session:</strong> 2024-25</p>
-                        <p><strong>Note:</strong> Semester Final Examination will start from 6th January, 2025. All students are requested to prepare accordingly and maintain the exam schedule strictly.</p>
+                        <p><strong>Note:</strong> Semester Final Examination will start from 6th January, 2026. All students are requested to prepare accordingly and maintain the exam schedule strictly.</p>
                     </div>
                     
-                    <div class="exam-table-container">
-                        <table class="exam-table">
-                            <thead>
-                                <tr>
-                                    <th>Date & Day</th>
-                                    <th>Course No.</th>
-                                    <th>Course Title</th>
-                                    <th>Time</th>
-                                </tr>
-                            </thead>
-                            <tbody>
-                                <tr>
-                                    <td><strong>06/01/2026</strong><br>Tuesday</td>
-                                    <td class="course-code-cell">CSE-1101</td>
-                                    <td>Computer Fundamentals</td>
-                                    <td class="time-cell">01:30 PM - 04:30 PM</td>
-                                </tr>
-                                <tr>
-                                    <td><strong>10/01/2026</strong><br>Saturday</td>
-                                    <td class="course-code-cell">CSE-1103</td>
-                                    <td>Structured Programming Language</td>
-                                    <td class="time-cell">01:30 PM - 04:30 PM</td>
-                                </tr>
-                                <tr>
-                                    <td><strong>14/01/2026</strong><br>Wednesday</td>
-                                    <td class="course-code-cell">MATH-1101</td>
-                                    <td>Differential Calculus and Co-ordinate Geometry</td>
-                                    <td class="time-cell">01:30 PM - 04:30 PM</td>
-                                </tr>
-                                <tr>
-                                    <td><strong>18/01/2026</strong><br>Sunday</td>
-                                    <td class="course-code-cell">PHY-1101</td>
-                                    <td>Physics</td>
-                                    <td class="time-cell">01:30 PM - 04:30 PM</td>
-                                </tr>
-                                <tr>
-                                    <td><strong>24/01/2026</strong><br>Saturday</td>
-                                    <td class="course-code-cell">HUM-1101</td>
-                                    <td>Communicative English</td>
-                                    <td class="time-cell">01:30 PM - 04:30 PM</td>
-                                </tr>
-                                <tr class="viva-voce-row">
-                                    <td><strong>25/01/2026</strong><br>Sunday</td>
-                                    <td class="course-code-cell">CSE-1150</td>
-                                    <td>Viva-Voce</td>
-                                    <td class="time-cell">10:00 AM</td>
-                                </tr>
-                            </tbody>
-                        </table>
+                    <div class="announcement-image-container">
+                        <img src="https://i.ibb.co.com/BFKW8fv/att-ma-FUVD93-AMe-W-x51z8xkz-EA0-MPd-Z-OLBLh2-H2fy-R-A.jpg" alt="Exam Schedule Announcement" class="announcement-image">
                     </div>
                     
-                    <div class="exam-notice">
+                    <div class="announcement-notice">
                         <p><strong>Important Notice:</strong> All examinations will be held at the CSE Department. Students must bring their ID cards and admit cards. Please arrive at least 30 minutes before the exam starts. Mobile phones are strictly prohibited in the examination hall.</p>
                     </div>
                     
-                    <div class="exam-footer">
-                        <p>With Concern of the Authority</p>
-                        <p><strong>Chairman</strong><br>
-                        1st Year 1st Semester Exam Committee-2025<br>
-                        Dept. of Computer Science and Engineering<br>
-                        Pabna University of Science and Technology</p>
+                    <div class="announcement-footer">
                     </div>
                 </div>
             </div>
@@ -1910,9 +1808,9 @@
         const loginError = document.getElementById('loginError');
         const logoutBtn = document.getElementById('logoutBtn');
         const currentYear = new Date().getFullYear();
-        const examScheduleBtn = document.getElementById('examScheduleBtn');
-        const examScheduleModal = document.getElementById('examScheduleModal');
-        const closeExamSchedule = document.getElementById('closeExamSchedule');
+        const announcementBtn = document.getElementById('announcementBtn');
+        const announcementModal = document.getElementById('announcementModal');
+        const closeAnnouncement = document.getElementById('closeAnnouncement');
         
         // New modal elements
         const privacyLink = document.getElementById('privacyLink');
@@ -2052,18 +1950,18 @@
 
         // Initialize all modals
         function initializeModals() {
-            // Exam Schedule modal
-            examScheduleBtn.addEventListener('click', () => {
-                examScheduleModal.style.display = 'flex';
+            // Announcement modal
+            announcementBtn.addEventListener('click', () => {
+                announcementModal.style.display = 'flex';
             });
             
-            closeExamSchedule.addEventListener('click', () => {
-                examScheduleModal.style.display = 'none';
+            closeAnnouncement.addEventListener('click', () => {
+                announcementModal.style.display = 'none';
             });
             
-            examScheduleModal.addEventListener('click', (e) => {
-                if (e.target === examScheduleModal) {
-                    examScheduleModal.style.display = 'none';
+            announcementModal.addEventListener('click', (e) => {
+                if (e.target === announcementModal) {
+                    announcementModal.style.display = 'none';
                 }
             });
             
@@ -2118,7 +2016,7 @@
             // Close modals with Escape key
             document.addEventListener('keydown', (e) => {
                 if (e.key === 'Escape') {
-                    examScheduleModal.style.display = 'none';
+                    announcementModal.style.display = 'none';
                     privacyModal.style.display = 'none';
                     termsModal.style.display = 'none';
                     contactModal.style.display = 'none';
