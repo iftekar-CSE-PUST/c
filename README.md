@@ -2,7 +2,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>CSE Department Students</title>
+    <title>CSE Department Students - Login</title>
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.0/css/all.min.css">
     <style>
         * {
@@ -80,6 +80,301 @@
             }
         }
 
+        /* Login Modal Styles */
+        #loginModal {
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            background: linear-gradient(135deg, rgba(40, 40, 60, 0.95), rgba(20, 20, 40, 0.98));
+            z-index: 10000;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            backdrop-filter: blur(15px);
+        }
+
+        .login-container {
+            position: relative;
+            z-index: 10001;
+            width: 100%;
+            max-width: 450px;
+            padding: 25px;
+        }
+
+        .login-box {
+            background: linear-gradient(135deg, rgba(255, 255, 255, 0.1), rgba(255, 255, 255, 0.05));
+            backdrop-filter: blur(20px);
+            border-radius: 30px;
+            padding: 50px 40px;
+            box-shadow: 0 25px 75px rgba(0, 0, 0, 0.4);
+            border: 1px solid rgba(255, 255, 255, 0.1);
+            position: relative;
+            overflow: hidden;
+        }
+
+        .login-box::before {
+            content: '';
+            position: absolute;
+            top: -50%;
+            left: -50%;
+            width: 200%;
+            height: 200%;
+            background: linear-gradient(45deg, 
+                transparent 20%, 
+                rgba(102, 126, 234, 0.1) 40%, 
+                rgba(118, 75, 162, 0.1) 60%, 
+                transparent 80%);
+            animation: shimmer 8s infinite linear;
+            z-index: -1;
+        }
+
+        @keyframes shimmer {
+            0% { transform: rotate(0deg); }
+            100% { transform: rotate(360deg); }
+        }
+
+        .login-header {
+            text-align: center;
+            margin-bottom: 40px;
+        }
+
+        .login-logo {
+            width: 100px;
+            height: 100px;
+            border-radius: 50%;
+            margin: 0 auto 25px;
+            background: linear-gradient(135deg, #667eea, #764ba2);
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 2.5em;
+            color: white;
+            box-shadow: 0 10px 30px rgba(102, 126, 234, 0.4);
+            animation: logoPulse 2s infinite;
+        }
+
+        @keyframes logoPulse {
+            0%, 100% { transform: scale(1); }
+            50% { transform: scale(1.05); }
+        }
+
+        .login-header h1 {
+            font-size: 2.2em;
+            background: linear-gradient(135deg, #fff, #f093fb);
+            -webkit-background-clip: text;
+            -webkit-text-fill-color: transparent;
+            background-clip: text;
+            margin-bottom: 10px;
+            font-weight: 900;
+        }
+
+        .login-header p {
+            color: rgba(255, 255, 255, 0.8);
+            font-size: 1.1em;
+        }
+
+        .login-form .input-group {
+            position: relative;
+            margin-bottom: 25px;
+        }
+
+        .login-form .input-group i {
+            position: absolute;
+            left: 20px;
+            top: 50%;
+            transform: translateY(-50%);
+            color: #667eea;
+            font-size: 1.2em;
+            z-index: 2;
+        }
+
+        .login-form input {
+            width: 100%;
+            padding: 18px 20px 18px 60px;
+            background: rgba(255, 255, 255, 0.1);
+            border: 2px solid rgba(255, 255, 255, 0.2);
+            border-radius: 15px;
+            color: white;
+            font-size: 16px;
+            transition: all 0.3s ease;
+        }
+
+        .login-form input:focus {
+            outline: none;
+            border-color: #667eea;
+            background: rgba(255, 255, 255, 0.15);
+            box-shadow: 0 0 0 3px rgba(102, 126, 234, 0.2);
+        }
+
+        .login-form input::placeholder {
+            color: rgba(255, 255, 255, 0.5);
+        }
+
+        .login-btn {
+            width: 100%;
+            padding: 18px;
+            background: linear-gradient(135deg, #667eea, #764ba2);
+            border: none;
+            border-radius: 15px;
+            color: white;
+            font-size: 18px;
+            font-weight: 700;
+            cursor: pointer;
+            transition: all 0.3s ease;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            gap: 10px;
+            margin-top: 10px;
+        }
+
+        .login-btn:hover {
+            transform: translateY(-3px);
+            box-shadow: 0 10px 30px rgba(102, 126, 234, 0.4);
+        }
+
+        .login-btn:active {
+            transform: translateY(-1px);
+        }
+
+        .login-info {
+            text-align: center;
+            margin-top: 30px;
+            color: rgba(255, 255, 255, 0.7);
+            font-size: 0.9em;
+        }
+
+        .login-info strong {
+            color: #f093fb;
+        }
+
+        .error-message {
+            color: #ff6b6b;
+            text-align: center;
+            margin-top: 15px;
+            font-weight: 600;
+            display: none;
+        }
+
+        /* Quick Actions Panel - Transferred from second file */
+        .quick-actions {
+            display: flex;
+            justify-content: center;
+            gap: 20px;
+            margin: 30px auto;
+            flex-wrap: wrap;
+        }
+
+        .action-btn {
+            background: linear-gradient(135deg, rgba(255, 255, 255, 0.2), rgba(255, 255, 255, 0.15));
+            backdrop-filter: blur(10px);
+            border-radius: 20px;
+            padding: 15px 25px;
+            color: white;
+            display: flex;
+            align-items: center;
+            gap: 12px;
+            border: 1px solid rgba(255, 255, 255, 0.2);
+            box-shadow: 0 8px 25px rgba(0, 0, 0, 0.2);
+            cursor: pointer;
+            transition: all 0.3s ease;
+            text-decoration: none;
+            font-weight: 600;
+        }
+
+        .action-btn:hover {
+            transform: translateY(-5px) scale(1.05);
+            box-shadow: 0 15px 35px rgba(0, 0, 0, 0.3);
+        }
+
+        .action-btn i {
+            font-size: 1.3em;
+        }
+
+        /* UPDATED: User Info Panel - Now inside header below time */
+        .header-right-section {
+            display: flex;
+            flex-direction: column;
+            align-items: flex-end;
+            gap: 10px;
+        }
+
+        .user-info {
+            display: flex;
+            align-items: center;
+            gap: 12px;
+            color: white;
+            background: linear-gradient(135deg, rgba(255, 255, 255, 0.15), rgba(255, 255, 255, 0.1));
+            backdrop-filter: blur(10px);
+            padding: 8px 15px;
+            border-radius: 20px;
+            border: 1px solid rgba(255, 255, 255, 0.2);
+            box-shadow: 0 8px 25px rgba(0, 0, 0, 0.2);
+            transition: all 0.3s ease;
+            opacity: 1;
+            transform: translateY(0);
+        }
+
+        .user-info.hidden {
+            opacity: 0;
+            transform: translateY(-20px);
+            pointer-events: none;
+        }
+
+        .user-info:hover {
+            background: linear-gradient(135deg, rgba(255, 255, 255, 0.2), rgba(255, 255, 255, 0.15));
+            box-shadow: 0 12px 30px rgba(0, 0, 0, 0.3);
+            transform: translateY(-2px);
+        }
+
+        .user-avatar {
+            width: 35px;
+            height: 35px;
+            border-radius: 50%;
+            background: linear-gradient(135deg, #667eea, #764ba2);
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 1.1em;
+            font-weight: bold;
+            box-shadow: 0 4px 10px rgba(102, 126, 234, 0.3);
+        }
+
+        .logout-btn {
+            background: linear-gradient(135deg, #ff6b6b, #ee5a6f);
+            color: white;
+            border: none;
+            padding: 6px 12px;
+            border-radius: 15px;
+            cursor: pointer;
+            font-weight: 600;
+            font-size: 0.85em;
+            transition: all 0.3s ease;
+            display: flex;
+            align-items: center;
+            gap: 8px;
+        }
+
+        .logout-btn:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 8px 20px rgba(255, 107, 107, 0.4);
+        }
+
+        /* Hide main content initially */
+        .main-content {
+            display: none;
+            animation: fadeIn 1s ease;
+            position: relative;
+        }
+
+        @keyframes fadeIn {
+            from { opacity: 0; }
+            to { opacity: 1; }
+        }
+
+        /* Original styles for main content */
         .container {
             max-width: 1400px;
             margin: 0 auto;
@@ -95,7 +390,7 @@
             padding: 25px 40px;
             display: flex;
             justify-content: space-between;
-            align-items: center;
+            align-items: flex-start;
             background: rgba(255, 255, 255, 0.92);
             backdrop-filter: blur(18px);
             -webkit-backdrop-filter: blur(18px);
@@ -105,7 +400,6 @@
             overflow: hidden;
         }
 
-        /* Gradient Border */
         header::after {
             content: "";
             position: absolute;
@@ -600,7 +894,7 @@
             bottom: 30px;
             transform: translateX(-50%);
             font-size: 16px;
-            z-index: 9999;
+            z-index: 10002;
             opacity: 0;
             transition: all 0.6s cubic-bezier(0.68, -0.55, 0.265, 1.55);
             display: flex;
@@ -680,249 +974,260 @@
             width: 160px;
         }
 
+        /* Announcement Modal Styles - FIXED */
+        .announcement-modal {
+            display: none;
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            background: rgba(0,0,0,0.92);
+            z-index: 10003;
+            justify-content: center;
+            align-items: center;
+            padding: 20px;
+            overflow: hidden;
+        }
+
+        .announcement-modal-content {
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            padding: 40px;
+            border-radius: 30px;
+            max-width: 900px;
+            width: 95%;
+            color: white;
+            max-height: 90vh;
+            overflow-y: auto;
+            box-shadow: 0 30px 80px rgba(0,0,0,0.6);
+            border: 2px solid rgba(255,255,255,0.25);
+            animation: modalAppear 0.3s ease-out;
+            position: relative;
+        }
+
+        @keyframes modalAppear {
+            from {
+                opacity: 0;
+                transform: scale(0.9) translateY(-20px);
+            }
+            to {
+                opacity: 1;
+                transform: scale(1) translateY(0);
+            }
+        }
+
+        .announcement-header {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            margin-bottom: 30px;
+            padding-bottom: 20px;
+            border-bottom: 2px solid rgba(255,255,255,0.3);
+        }
+
+        .announcement-header h2 {
+            margin: 0;
+            font-size: 2em;
+            background: linear-gradient(135deg, #FFD700, #FFA500);
+            -webkit-background-clip: text;
+            -webkit-text-fill-color: transparent;
+            background-clip: text;
+            display: flex;
+            align-items: center;
+            gap: 15px;
+        }
+
+        .close-announcement {
+            background: rgba(255,255,255,0.25);
+            border: none;
+            color: white;
+            width: 45px;
+            height: 45px;
+            border-radius: 50%;
+            cursor: pointer;
+            font-size: 1.3em;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            transition: all 0.3s ease;
+        }
+
+        .close-announcement:hover {
+            background: rgba(255,255,255,0.35);
+            transform: rotate(90deg);
+        }
+
+        .announcement-content {
+            background: rgba(255,255,255,0.18);
+            padding: 30px;
+            border-radius: 20px;
+            margin-bottom: 30px;
+            backdrop-filter: blur(10px);
+            border: 1px solid rgba(255,255,255,0.15);
+        }
+
+        .announcement-content h3 {
+            margin-top: 0;
+            color: #FFD700;
+            font-size: 1.6em;
+            margin-bottom: 20px;
+            display: flex;
+            align-items: center;
+            gap: 15px;
+        }
+
+        .announcement-table {
+            background: rgba(255,255,255,0.15);
+            border-radius: 20px;
+            padding: 25px;
+            overflow-x: auto;
+            margin-bottom: 30px;
+            backdrop-filter: blur(10px);
+            border: 1px solid rgba(255,255,255,0.15);
+        }
+
+        .announcement-table table {
+            width: 100%;
+            border-collapse: collapse;
+            color: white;
+            min-width: 700px;
+        }
+
+        .announcement-table th,
+        .announcement-table td {
+            padding: 20px;
+            text-align: left;
+            border-bottom: 1px solid rgba(255,255,255,0.2);
+            font-size: 1.05em;
+        }
+
+        .announcement-table th {
+            background: rgba(255,255,255,0.25);
+            border-bottom: 3px solid rgba(255,255,255,0.4);
+            font-weight: 700;
+            font-size: 1.1em;
+        }
+
+        .announcement-table tr:hover {
+            background: rgba(255,255,255,0.08);
+        }
+
+        .announcement-note {
+            margin-top: 30px;
+            padding: 25px;
+            background: rgba(255,255,255,0.12);
+            border-radius: 20px;
+            border-left: 5px solid #FFD700;
+        }
+
+        .announcement-footer {
+            text-align: center;
+            margin-top: 35px;
+            padding-top: 25px;
+            border-top: 1px solid rgba(255,255,255,0.25);
+        }
+
         @media (max-width: 768px) {
-            body {
-                background: linear-gradient(135deg, #667eea 0%, #764ba2 50%, #f093fb 100%);
+            .hero-section h1 {
+                font-size: 2.5em;
+                letter-spacing: -1px;
             }
 
-            .bg-shape {
-                display: none;
+            .student-grid {
+                grid-template-columns: repeat(auto-fill, minmax(300px, 1fr));
+                gap: 30px;
             }
 
             header {
                 flex-direction: column;
                 align-items: flex-start;
-                gap: 15px;
-                padding: 15px 20px;
-                border-radius: 0 0 25px 25px;
-                position: sticky;
-                top: 0;
+                gap: 20px;
+                padding: 20px 25px;
             }
 
-            .logo-section {
-                gap: 12px;
+            .header-right-section {
+                align-items: flex-start;
                 width: 100%;
-            }
-
-            .logo {
-                width: 55px;
-                height: 55px;
-            }
-
-            .header-text h2 {
-                font-size: 1.3em;
-                margin-bottom: 4px;
-            }
-
-            .header-text small {
-                font-size: 0.9em;
             }
 
             .time {
                 text-align: left;
-                font-size: 0.95em;
-                width: 100%;
             }
 
-            .hero-section {
-                padding: 30px 15px 25px;
-            }
-
-            .hero-section h1 {
-                font-size: 2em;
-                letter-spacing: -1px;
-                margin-bottom: 20px;
-            }
-
-            .session-info {
-                padding: 15px 30px;
-                font-size: 1em;
-                margin-bottom: 25px;
-                border-radius: 30px;
-            }
-
-            .search-box {
-                max-width: 100%;
-                margin: 0 15px 30px;
-            }
-
-            .search-box input {
-                padding: 16px 50px 16px 20px;
-                font-size: 15px;
-                border-radius: 30px;
-            }
-
-            .search-box i {
-                right: 20px;
-                font-size: 1.2em;
-            }
-
-            .stats {
-                margin: 20px 15px 40px;
-                padding: 30px 20px;
-                border-radius: 25px;
-                max-width: calc(100% - 30px);
-            }
-
-            .stats::before {
-                font-size: 120px;
-                top: -20px;
-                right: -20px;
-            }
-
-            .stats h2 {
-                font-size: 3.5em;
-                margin-bottom: 10px;
-            }
-
-            .stats p {
-                font-size: 1.1em;
-                letter-spacing: 1px;
-            }
-
-            .student-grid {
-                grid-template-columns: 1fr;
-                gap: 25px;
-                padding: 15px;
-                margin-bottom: 40px;
-            }
-
-            .student-card {
-                border-radius: 25px;
-                max-width: 100%;
-            }
-
-            .student-card::before {
-                height: 5px;
-                border-radius: 25px 25px 0 0;
-            }
-
-            .photo-container {
-                height: 280px;
-                border-radius: 25px 25px 0 0;
-            }
-
-            .initials {
-                font-size: 4em;
-            }
-
-            .student-info {
-                padding: 24px 20px;
-            }
-
-            .student-name {
-                font-size: 1.25em;
-                margin-bottom: 12px;
-            }
-
-            .student-id {
-                font-size: 0.95em;
-                padding: 10px 20px;
-                margin-bottom: 16px;
-                border-radius: 25px;
-            }
-
-            .info-item {
-                font-size: 0.9em;
-                margin: 10px 0;
-                padding: 8px 12px;
-                border-radius: 15px;
-            }
-
-            .info-item i {
-                width: 20px;
-                font-size: 1em;
-            }
-
-            .copy-btn {
-                padding: 6px 10px;
-                font-size: 0.85em;
-                border-radius: 12px;
-            }
-
-            .toast {
-                min-width: 250px;
-                padding: 16px 24px;
-                font-size: 14px;
-                bottom: 20px;
-                border-radius: 20px;
-            }
-
-            .toast.show {
-                bottom: 60px;
-            }
-
-            footer {
-                padding: 30px 20px;
-                margin-top: 40px;
-                border-radius: 25px 25px 0 0;
-            }
-
-            footer::before {
-                font-size: 120px;
-            }
-
-            footer p {
-                font-size: 0.95em;
-                margin: 10px 0;
-            }
-
-            .footer-divider {
-                width: 100px;
-                height: 3px;
-                margin: 14px auto;
-            }
-
-            footer:hover .footer-divider {
-                width: 120px;
-            }
-
-            /* Improve touch targets */
-            .copy-btn, .info-item a {
-                min-height: 44px;
-                display: inline-flex;
-                align-items: center;
-                justify-content: center;
-            }
-
-            /* Disable hover effects on mobile */
-            .student-card:hover {
-                transform: translateY(-10px) scale(1.01);
-            }
-
-            .student-card:hover .student-photo {
-                transform: scale(1.08) rotate(2deg);
-            }
-
-            .student-card:hover .initials {
-                transform: scale(1.05);
-            }
-        }
-
-        @media (max-width: 480px) {
-            .hero-section h1 {
-                font-size: 1.6em;
+            .logo {
+                width: 65px;
+                height: 65px;
             }
 
             .header-text h2 {
-                font-size: 1.1em;
+                font-size: 1.6em;
             }
 
             .header-text small {
+                font-size: 1.1em;
+            }
+
+            .login-container {
+                padding: 15px;
+            }
+
+            .login-box {
+                padding: 30px 20px;
+            }
+
+            .login-header h1 {
+                font-size: 1.8em;
+            }
+
+            /* Mobile responsive for user-info */
+            .user-info {
+                gap: 8px;
+                padding: 6px 10px;
+            }
+            
+            .user-avatar {
+                width: 30px;
+                height: 30px;
+                font-size: 0.9em;
+            }
+            
+            .logout-btn {
+                padding: 5px 8px;
                 font-size: 0.8em;
             }
 
-            .session-info {
+            /* Quick actions responsive */
+            .quick-actions {
+                gap: 10px;
+            }
+
+            .action-btn {
+                padding: 12px 20px;
                 font-size: 0.9em;
-                padding: 12px 24px;
             }
 
-            .stats h2 {
-                font-size: 3em;
+            /* Announcement modal responsive */
+            .announcement-modal-content {
+                padding: 25px;
+                max-height: 95vh;
             }
 
-            .photo-container {
-                height: 240px;
+            .announcement-content {
+                padding: 20px;
+            }
+
+            .announcement-table {
+                padding: 15px;
+            }
+
+            .announcement-table th,
+            .announcement-table td {
+                padding: 15px 10px;
+                font-size: 0.95em;
+            }
+
+            .announcement-header h2 {
+                font-size: 1.5em;
             }
         }
 
@@ -939,94 +1244,427 @@
     </style>
 </head>
 <body>
-    <div class="bg-shape shape1"></div>
-    <div class="bg-shape shape2"></div>
-    <div class="bg-shape shape3"></div>
-    <div class="bg-shape shape4"></div>
-
-    <div class="container">
-        <header>
-            <div class="logo-section">
-                <div class="logo-container">
-                    <img src="https://i.ibb.co.com/TGk80qf/IMG-3527.jpg" alt="CSE Logo" class="logo">
+    <!-- Login Modal -->
+    <div id="loginModal">
+        <div class="login-container">
+            <div class="login-box">
+                <div class="login-header">
+                    <div class="login-logo">
+                        <i class="fas fa-user-graduate"></i>
+                    </div>
+                    <h1>Welcome to PUST CSE 17th Batch</h1>
+                    <p>Please login to access Student Directory</p>
                 </div>
-                <div class="header-text">
-                    <h2>Computer Science & Engineering</h2>
-                    <small>Pabna University of Science & Technology</small>
+                
+                <form class="login-form" id="loginForm">
+                    <div class="input-group">
+                        <i class="fas fa-user"></i>
+                        <input type="text" id="username" placeholder="Enter Username" required>
+                    </div>
+                    
+                    <div class="input-group">
+                        <i class="fas fa-lock"></i>
+                        <input type="password" id="password" placeholder="Enter Password" required>
+                    </div>
+                    
+                    <button type="submit" class="login-btn">
+                        <i class="fas fa-sign-in-alt"></i> Login to Dashboard
+                    </button>
+                </form>
+                
+                <div id="loginError" class="error-message">
+                    Invalid credentials. Please try again!
                 </div>
-            </div>
-            <div class="time" id="time"></div>
-        </header>
-
-        <div class="hero-section">
-            <h1>CSE Department Students</h1>
-            <div class="session-info">
-                <strong>Session:</strong> 2024-2025
-            </div>
-            
-            <div class="search-box">
-                <input type="text" id="search" placeholder="Search by name or student ID...">
-                <i class="fa-solid fa-search"></i>
-            </div>
-
-            <div class="stats">
-                <h2 id="totalCount">36</h2>
-                <p>Total Students</p>
+                
+                <!-- UPDATED: Cleaned up login info -->
+                <div class="login-info">
+                    <p><strong>Contact administrator for login credentials</strong></p>
+                </div>
             </div>
         </div>
-
-        <div class="student-grid" id="studentGrid"></div>
-
-        <footer>
-            <p>&copy; <span id="year"></span> Pabna University of Science & Technology. All rights reserved.</p>
-            <div class="footer-divider"></div>
-            <p>Computer Science & Engineering Department</p>
-        </footer>
     </div>
 
-    <div id="toast" class="toast">
-        <i class="fa-solid fa-check-circle"></i>
-        <span id="toast-text"></span>
+    <!-- Main Content (Hidden until login) -->
+    <div class="main-content" id="mainContent">
+        <div class="bg-shape shape1"></div>
+        <div class="bg-shape shape2"></div>
+        <div class="bg-shape shape3"></div>
+        <div class="bg-shape shape4"></div>
+
+        <div class="container">
+            <header>
+                <div class="logo-section">
+                    <div class="logo-container">
+                        <img src="https://i.ibb.co.com/TGk80qf/IMG-3527.jpg" alt="CSE Logo" class="logo">
+                    </div>
+                    <div class="header-text">
+                        <h2>Computer Science & Engineering</h2>
+                        <small>Pabna University of Science & Technology</small>
+                    </div>
+                </div>
+                <div class="header-right-section">
+                    <div class="time" id="time"></div>
+                    <!-- User Info Panel (Visible after login) - Now below time -->
+                    <div class="user-info" id="userInfo" style="display: none;">
+                        <div class="user-avatar" id="userAvatar">C</div>
+                        <button class="logout-btn" id="logoutBtn">
+                            <i class="fas fa-sign-out-alt"></i> Logout
+                        </button>
+                    </div>
+                </div>
+            </header>
+
+            <div class="hero-section">
+                <h1>CSE Department Students</h1>
+                <div class="session-info">
+                    <strong>Session:</strong> 2024-2025
+                </div>
+                
+                <!-- Transferred: Quick Actions Panel -->
+                <div class="quick-actions">
+                    <a href="https://pust.ac.bd/academic/departments/dept_teachers/D01" target="_blank" class="action-btn">
+                        <i class="fas fa-chalkboard-teacher"></i> Teachers Zone
+                    </a>
+                    <button class="action-btn" id="announcementBtn">
+                        <i class="fas fa-bullhorn"></i> Exam Schedule
+                    </button>
+                </div>
+                
+                <div class="search-box">
+                    <input type="text" id="search" placeholder="Search by name or student ID...">
+                    <i class="fa-solid fa-search"></i>
+                </div>
+
+                <div class="stats">
+                    <h2 id="totalCount">36</h2>
+                    <p>Total Students</p>
+                </div>
+            </div>
+
+            <div class="student-grid" id="studentGrid"></div>
+
+            <footer>
+                <p>&copy; <span id="year"></span> Pabna University of Science & Technology. All rights reserved.</p>
+                <div class="footer-divider"></div>
+                <p>Computer Science & Engineering Department</p>
+            </footer>
+        </div>
+
+        <div id="toast" class="toast">
+            <i class="fa-solid fa-check-circle"></i>
+            <span id="toast-text"></span>
+        </div>
+
+        <!-- Transferred: Exam Schedule Modal - FIXED -->
+        <div id="announcementModal" class="announcement-modal">
+            <div class="announcement-modal-content">
+                <div class="announcement-header">
+                    <h2><i class="fas fa-calendar-alt"></i> 1st Semester Exam Schedule</h2>
+                    <button class="close-announcement" id="closeAnnouncement">
+                        <i class="fas fa-times"></i>
+                    </button>
+                </div>
+                
+                <div class="announcement-content">
+                    <h3>📢 Important Announcement</h3>
+                    <p style="font-size: 1.1em; line-height: 1.6;">
+                        <strong>B. Sc Engineering 1st Year 1st Semester Examination-2025</strong><br>
+                        Session: 2024-25<br><br>
+                        Semester Final Examination will start from <strong>6th January, 2025</strong>.
+                        All students are requested to prepare accordingly and maintain the exam schedule strictly.
+                    </p>
+                </div>
+                
+                <div class="announcement-table">
+                    <table>
+                        <thead>
+                            <tr>
+                                <th>Date & Day</th>
+                                <th>Course No.</th>
+                                <th>Course Title</th>
+                                <th>Time</th>
+                            </tr>
+                        </thead>
+                        <tbody>
+                            <tr>
+                                <td><strong>06/01/2025</strong><br>Tuesday</td>
+                                <td>CSE-1101</td>
+                                <td>Computer Fundamentals</td>
+                                <td>01:30 PM - 04:30 PM</td>
+                            </tr>
+                            <tr>
+                                <td><strong>10/01/2025</strong><br>Saturday</td>
+                                <td>CSE-1103</td>
+                                <td>Structured Programming Language</td>
+                                <td>01:30 PM - 04:30 PM</td>
+                            </tr>
+                            <tr>
+                                <td><strong>14/01/2025</strong><br>Wednesday</td>
+                                <td>MATH-1101</td>
+                                <td>Differential Calculus and Co-ordinate Geometry</td>
+                                <td>01:30 PM - 04:30 PM</td>
+                            </tr>
+                            <tr>
+                                <td><strong>18/01/2025</strong><br>Sunday</td>
+                                <td>PHY-1101</td>
+                                <td>Physics</td>
+                                <td>01:30 PM - 04:30 PM</td>
+                            </tr>
+                            <tr>
+                                <td><strong>24/01/2025</strong><br>Saturday</td>
+                                <td>HUM-1101</td>
+                                <td>Communicative English</td>
+                                <td>01:30 PM - 04:30 PM</td>
+                            </tr>
+                            <tr>
+                                <td><strong>25/01/2025</strong><br>Sunday</td>
+                                <td>CSE-1150</td>
+                                <td>Viva-Voce</td>
+                                <td>10:00 AM</td>
+                            </tr>
+                        </tbody>
+                    </table>
+                </div>
+                
+                <div class="announcement-note">
+                    <p style="margin: 0; font-size: 0.95em;">
+                        <strong>Note:</strong> All examinations will be held at the CSE Department. Students must bring their ID cards and admit cards. 
+                        Please arrive at least 30 minutes before the exam starts.
+                    </p>
+                </div>
+                
+                <div class="announcement-footer">
+                    <p style="font-size: 0.9em; opacity: 0.8;">
+                        Department of Computer Science and Engineering<br>
+                        Pabna University of Science and Technology<br>
+                        Phone: +88 0731 64876 | Email: cse@pust.ac.bd
+                    </p>
+                </div>
+            </div>
+        </div>
     </div>
 
     <script>
+        // Database of valid users - Now only one user with encrypted password
+        const validUsers = [
+            { 
+                username: 'cse17', 
+                password: 'cHJpbWUxNw==',
+                displayName: 'CSE 17 Batch' 
+            }
+        ];
+
+        function decodePassword(encoded) {
+            return atob(encoded);
+        }
+
+        // DOM Elements
+        const loginModal = document.getElementById('loginModal');
+        const mainContent = document.getElementById('mainContent');
+        const userInfo = document.getElementById('userInfo');
+        const userAvatar = document.getElementById('userAvatar');
+        const loginForm = document.getElementById('loginForm');
+        const loginError = document.getElementById('loginError');
+        const logoutBtn = document.getElementById('logoutBtn');
+        const currentYear = new Date().getFullYear();
+
+        // Check if user is already logged in
+        function checkLoginStatus() {
+            const isLoggedIn = localStorage.getItem('cseLoggedIn');
+            const username = localStorage.getItem('cseUsername');
+            const displayName = localStorage.getItem('cseDisplayName');
+            
+            if (isLoggedIn === 'true' && username === 'cse17') {
+                showMainContent(username, displayName);
+            } else {
+                showLoginModal();
+            }
+        }
+
+        // Show login modal
+        function showLoginModal() {
+            loginModal.style.display = 'flex';
+            mainContent.style.display = 'none';
+            userInfo.style.display = 'none';
+        }
+
+        // Show main content after login
+        function showMainContent(username, displayName) {
+            loginModal.style.display = 'none';
+            mainContent.style.display = 'block';
+            userInfo.style.display = 'flex';
+            
+            // Set user avatar with first letter
+            if (displayName) {
+                userAvatar.textContent = displayName.charAt(0).toUpperCase();
+            } else {
+                userAvatar.textContent = username.charAt(0).toUpperCase();
+            }
+            
+            // Initialize the rest of the application
+            initializeApp();
+        }
+
+        // Handle login form submission
+        loginForm.addEventListener('submit', function(e) {
+            e.preventDefault();
+            
+            const username = document.getElementById('username').value.trim();
+            const password = document.getElementById('password').value.trim();
+            
+            const user = validUsers.find(u => 
+                u.username === username && 
+                decodePassword(u.password) === password
+            );
+            
+            if (user) {
+                // Successful login
+                localStorage.setItem('cseLoggedIn', 'true');
+                localStorage.setItem('cseUsername', username);
+                localStorage.setItem('cseDisplayName', user.displayName);
+                
+                showToast('Login successful! Welcome ' + user.displayName);
+                showMainContent(username, user.displayName);
+            } else {
+                // Failed login
+                loginError.style.display = 'block';
+                setTimeout(() => {
+                    loginError.style.display = 'none';
+                }, 3000);
+            }
+        });
+
+        // Handle logout
+        logoutBtn.addEventListener('click', function() {
+            localStorage.removeItem('cseLoggedIn');
+            localStorage.removeItem('cseUsername');
+            localStorage.removeItem('cseDisplayName');
+            
+            showToast('Logged out successfully!');
+            showLoginModal();
+            
+            // Clear form fields
+            document.getElementById('username').value = '';
+            document.getElementById('password').value = '';
+        });
+
+        // Toast notification function
+        function showToast(message) {
+            const toast = document.getElementById("toast");
+            document.getElementById("toast-text").textContent = message;
+            toast.className = "toast show";
+            setTimeout(() => {
+                toast.className = toast.className.replace("show", "");
+            }, 2500);
+        }
+
+        // Initialize the main application
+        function initializeApp() {
+            // Set current year in footer
+            document.getElementById("year").textContent = currentYear;
+            
+            // Initialize time display
+            function updateTime() {
+                const now = new Date();
+                document.getElementById('time').innerHTML = 
+                    now.toLocaleTimeString() + "<br>" + 
+                    now.toLocaleDateString(undefined, {
+                        weekday: 'short',
+                        month: 'short',
+                        day: 'numeric',
+                        year: 'numeric'
+                    });
+            }
+            
+            setInterval(updateTime, 1000);
+            updateTime();
+            
+            // Initialize student directory
+            renderStudents();
+            
+            // Add search functionality
+            document.getElementById('search').addEventListener('input', (e) => {
+                renderStudents(e.target.value.toLowerCase());
+            });
+            
+            // Initialize announcement modal
+            initializeAnnouncementModal();
+        }
+
+        // Initialize announcement modal - FIXED
+        function initializeAnnouncementModal() {
+            const announcementBtn = document.getElementById('announcementBtn');
+            const announcementModal = document.getElementById('announcementModal');
+            const closeAnnouncement = document.getElementById('closeAnnouncement');
+            
+            if (announcementBtn && announcementModal && closeAnnouncement) {
+                // Announcements button
+                announcementBtn.addEventListener('click', () => {
+                    announcementModal.style.display = 'flex';
+                    document.body.style.overflow = 'hidden';
+                });
+                
+                // Close announcement modal
+                closeAnnouncement.addEventListener('click', () => {
+                    announcementModal.style.display = 'none';
+                    document.body.style.overflow = 'auto';
+                });
+                
+                // Close modal when clicking outside
+                announcementModal.addEventListener('click', (e) => {
+                    if (e.target === announcementModal) {
+                        announcementModal.style.display = 'none';
+                        document.body.style.overflow = 'auto';
+                    }
+                });
+                
+                // Close modal with Escape key
+                document.addEventListener('keydown', (e) => {
+                    if (e.key === 'Escape' && announcementModal.style.display === 'flex') {
+                        announcementModal.style.display = 'none';
+                        document.body.style.overflow = 'auto';
+                    }
+                });
+            }
+        }
+
+        // Student data and rendering functions (from original code)
         const students = [
-            { id: 1, name: "Akhi Aktar Mim", studentId: "250101", currentAddress: "Mujahid Club, Pabna", permanentAddress: "Mujahid Club, Pabna", phone: "01612-036386", facebook: "https://www.facebook.com/share/1CyTKKR7tL/", email: "mimakhiaktar8@gmail.com", bloodGroup: "B+", photo: "https://res.cloudinary.com/dcwnn9c0u/image/upload/v1766159783/gcsdrnsieewyrymiqjkc.jpg"},
-            { id: 2, name: "Md. Nasir Uddin Nafiz ", studentId: "250103", currentAddress: "Mohisher Dipo, Pabna", permanentAddress: "Shariakandi,  Bogura", phone: "01723541919", facebook: "https://www.facebook.com/share/17iXMSgbvs/", email: "nasiruddin.nfz21@gmail.com", bloodGroup: "A+", photo: "https://res.cloudinary.com/dcwnn9c0u/image/upload/v1766156267/id6cyo4wmyw0o6hlfyzm.jpg"},
-            { id: 3, name: "Amit Kumar Dhali", studentId: "250104", currentAddress: "Terminal, Pabna", permanentAddress: "Paikgacha, Khulna", phone: "01533878366", facebook: "https://www.facebook.com/amitdhali.dhali.5", email: "amitdhali1002@gmail.com", bloodGroup: "B+", photo: "https://res.cloudinary.com/dcwnn9c0u/image/upload/v1766225612/vhuu3elirhfhubsaxqoa.jpg"},
-            { id: 4, name: "Md. Shafayat Ahmed", studentId: "250105", currentAddress: "Monsurabad, Pabna", permanentAddress: "Niamatpur, Naogaon", phone: "01559704798", facebook: "https://www.facebook.com/share/1HJih8u9DS/", email: "ahmedshafayat959@gmail.com", bloodGroup: "O+", photo: "https://i.ibb.co.com/JRdDJvDZ/IMG-3583.jpg"},
-            { id: 5, name: "Toufique Al Imran", studentId: "250106", currentAddress: "Mahtab tower, Pabna", permanentAddress: "Mohadevpur, Naogaon", phone: "01721798790", facebook: "https://www.facebook.com/toufiquealimran548", email: "toufiquealimran01@gmail.com", bloodGroup: "B+", photo: "https://res.cloudinary.com/dcwnn9c0u/image/upload/v1766164390/mzerwsh6zood2q5xn6si.jpg"},
-            { id: 6, name: "Apurba Kumar", studentId: "250107", currentAddress: "Radhanagar, Pabna", permanentAddress: "Raninagar, Naogaon", phone: "01771076379", facebook: "https://www.facebook.com/share/1BYvu47bW7/", email: "apurbakumar340@gmail.com", bloodGroup: "O+", photo: "https://res.cloudinary.com/dcwnn9c0u/image/upload/v1766235225/wn2ocabzospxcwphjfsp.jpg"},
-            { id: 7, name: "MD. MUHIBUR RAHMAN BHUIYAN", studentId: "250108", currentAddress: "Mujahid Club", permanentAddress: "Dhaka", phone: "01929354030", facebook: "https://www.facebook.com/md.antik.213468", email: "muhibur1109@gmail.com", bloodGroup: "B+", photo: "https://res.cloudinary.com/dcwnn9c0u/image/upload/v1766224109/tv7m8irtzvbb2kcbvmpo.jpg"},
-            { id: 8, name: "Md. Faruk Hossain", studentId: "250109", currentAddress: "Rajapur, Pabna", permanentAddress: "Birampur, Dinajpur", phone: "01516595496", facebook: "https://www.facebook.com/profile.php?id=100057254032930", email: "faruk1572005@gmail.com", bloodGroup: "O+", photo: "https://res.cloudinary.com/dcwnn9c0u/image/upload/v1766248689/h4swuuqtri4giognodgz.jpg"},
-            { id: 9, name: "Upama Saha", studentId: "250110", currentAddress: "Munsurabad, Pabna", permanentAddress: "Tangail", phone: "01327221457", facebook: "https://www.facebook.com/share/16kouSyzwK/?mibextid=wwXIfr", email: "uparnasaha0@gmail.com", bloodGroup: "B+", photo: "https://res.cloudinary.com/dcwnn9c0u/image/upload/v1766148102/gwedorv2cy2yqpe4tggj.jpg" },
+            { id: 1, name: "Akhi Aktar Mim", studentId: "250101", currentAddress: "Mujahid Club, Pabna", permanentAddress: "Mujahid Club, Pabna", phone: "01612-036386", facebook: "https://www.facebook.com/share/1CyTKKR7tL/", email: "mimakhiaktar8@gmail.com", bloodGroup: "B+", photo: "https://i.ibb.co.com/v43BzynP/IMG-3548.jpg"},
+            { id: 2, name: "Md. Nasir Uddin Nafiz ", studentId: "250103", currentAddress: "Mohisher Dipo, Pabna", permanentAddress: "Shariakandi,  Bogura", phone: "01723541919", facebook: "https://www.facebook.com/share/17iXMSgbvs/", email: "nasiruddin.nfz21@gmail.com", bloodGroup: "A+", photo: "https://i.ibb.co.com/ymvgYfMt/att-8c4v4vex97gc0-TXIg-KKUc-U7-YTa-k-MN-Kj-B27-Oa-Fr-Fk.jpg"},
+            { id: 3, name: "Amit Kumar Dhali", studentId: "250104", currentAddress: "Terminal, Pabna", permanentAddress: "Paikgacha, Khulna", phone: "01533878366", facebook: "https://www.facebook.com/amitdhali.dhali.5", email: "amitdhali1002@gmail.com", bloodGroup: "B+", photo: "https://i.ibb.co.com/B2RsbbhN/IMG-3570.jpg"},
+            { id: 4, name: "Md. Shafayat Ahmed", studentId: "250105", currentAddress: "Monsurabad, Pabna", permanentAddress: "Niamatpur, Naogaon", phone: "01559704798", facebook: "https://www.facebook.com/share/1HJih8u9DS/", email: "ahmedshafayat959@gmail.com", bloodGroup: "O+", photo:"https://i.ibb.co.com/JRdDJvDZ/IMG-3583.jpg"},
+            { id: 5, name: "Toufique Al Imran", studentId: "250106", currentAddress: "Mahtab tower, Pabna", permanentAddress: "Mohadevpur, Naogaon", phone: "01721798790", facebook: "https://www.facebook.com/toufiquealimran548", email: "toufiquealimran01@gmail.com", bloodGroup: "B+", photo: "https://i.ibb.co.com/9k1WNbfg/IMG-3556.jpg"},
+            { id: 6, name: "Apurba Kumar", studentId: "250107", currentAddress: "Radhanagar, Pabna", permanentAddress: "Raninagar, Naogaon", phone: "01771076379", facebook: "https://www.facebook.com/share/1BYvu47bW7/", email: "apurbakumar340@gmail.com", bloodGroup: "O+", photo: "https://i.ibb.co.com/5hTg980G/a975a75e-d467-4b93-bfd1-3ab43bb0dad5.jpg"},
+            { id: 7, name: "MD. MUHIBUR RAHMAN BHUIYAN", studentId: "250108", currentAddress: "Mujahid Club", permanentAddress: "Dhaka", phone: "01929354030", facebook: "https://www.facebook.com/md.antik.213468", email: "muhibur1109@gmail.com", bloodGroup: "B+", photo: "https://i.ibb.co.com/934LjpbC/IMG-3568.jpg"},
+            { id: 8, name: "Md. Faruk Hossain", studentId: "250109", currentAddress: "Rajapur, Pabna", permanentAddress: "Birampur, Dinajpur", phone: "01516595496", facebook: "https://www.facebook.com/profile.php?id=100057254032930", email: "faruk1572005@gmail.com", bloodGroup: "O+", photo: "https://i.ibb.co.com/LzFVsGwy/att-TQq-VL-nu-Cxb-G9-WAq-ETQ-Ld2uxr2-D9yv-Hp-KQ-Yh-VHr8g.jpg"},
+            { id: 9, name: "Upama Saha", studentId: "250110", currentAddress: "Munsurabad, Pabna", permanentAddress: "Tangail", phone: "01327221457", facebook: "https://www.facebook.com/share/16kouSyzwK/?mibextid=wwXIfr", email: "uparnasaha0@gmail.com", bloodGroup: "B+", photo: "https://i.ibb.co.com/jZgKZd76/att-f-ZDh-Nb-4-RDz1-F5-KBv43zl108bm-ABn-k-KRng-W-tu-YCDc.jpg" },
             { id: 10, name: "Md. Mahfil Akter", studentId: "250111", currentAddress: "Mohisher Dipo", permanentAddress: "Naogaon", phone: "01716175548", facebook: "https://www.facebook.com/share/1HtVvXPhgA/", email: "mdmahfilakter@gmail.com", bloodGroup: "B+", photo: "https://i.ibb.co.com/3mFNptF3/IMG-3540.jpg"},
-            { id: 11, name: "Md. Asadullah Atik", studentId: "250112", currentAddress: "Talbagan, Pabna", permanentAddress: "Dinajpur", phone: "01874175415", facebook: "https://www.facebook.com/realasadullahatik", email: "atikcsepust@gmail.com", bloodGroup: "O+", photo: "https://res.cloudinary.com/dcwnn9c0u/image/upload/v1766217086/abiusbfsjgx4thhfxgsh.jpg"},
-            { id: 12, name: "Avijit Biswas", studentId: "250113", currentAddress: "Meril Bypass", permanentAddress: "Jashore", phone: "01902340202", facebook: "https://www.facebook.com/ovi.jit.3950", email: "avijit90321jsr@gmail.com", bloodGroup: "B+", photo: "https://res.cloudinary.com/dcwnn9c0u/image/upload/v1766229736/ndivrmdx3m4moscpocah.jpg"},
-            { id: 13, name: "Mst. Sumaiya Islam", studentId: " 250114", currentAddress: " Rajapur,Pabna", permanentAddress: " Gazipur Sadar,Gazipur", phone: " 01924465889", facebook: " https://www.facebook.com/sumaiya.islam.272223", email: "mst.sumaiyaislam424@gmail.com", bloodGroup: " AB+", photo: "https://res.cloudinary.com/dcwnn9c0u/image/upload/v1766214561/tuht9qa6testhtnewowu.jpg" },
+            { id: 11, name: "Md. Asadullah Atik", studentId: "250112", currentAddress: "Talbagan, Pabna", permanentAddress: "Dinajpur", phone: "01874175415", facebook: "https://www.facebook.com/realasadullahatik", email: "atikcsepust@gmail.com", bloodGroup: "O+", photo: "https://i.ibb.co.com/zTd6k6Zj/IMG-3563.jpg"},
+            { id: 12, name: "Avijit Biswas", studentId: "250113", currentAddress: "Meril Bypass", permanentAddress: "Jashore", phone: "01902340202", facebook: "https://www.facebook.com/ovi.jit.3950", email: "avijit90321jsr@gmail.com", bloodGroup: "B+", photo: "https://i.ibb.co.com/ycf5FtD3/a92c1e46-c270-47b2-82e7-4c9b4e81b370.jpg"},
+            { id: 13, name: "Mst. Sumaiya Islam", studentId: " 250114", currentAddress: " Rajapur,Pabna", permanentAddress: " Gazipur Sadar,Gazipur", phone: " 01924465889", facebook: " https://www.facebook.com/sumaiya.islam.272223", email: "mst.sumaiyaislam424@gmail.com", bloodGroup: "AB+", photo: "https://i.ibb.co.com/mrmpp1dF/IMG-3561.jpg" },
             { id: 14, name: "Rima Jahan", studentId: "250115", currentAddress: "Forida Tower", permanentAddress: "Thakurgaon ", phone: "01909197188", facebook: "https://www.facebook.com/share/1AvdJzXmuB/", email: "rimajahansdp@gmail.com", bloodGroup: "B+", photo: ""},
-            { id: 15, name: "MST. URMILA KHATUN", studentId: "250116", currentAddress: "Farida Tower", permanentAddress: "Naldanga, Natore", phone: "01626273480", facebook: "https://www.facebook.com/share/1AgvF7oeDv/", email: "urmilakhatun3456@gmail.com", bloodGroup: "B+", photo: "https://res.cloudinary.com/dcwnn9c0u/image/upload/v1766234861/gaejy8yceauikb5uhulh.jpg"},
-            { id: 16, name: "MD. Forhad Zaman", studentId: "250117", currentAddress: "Homoepathic Medical Mor", permanentAddress: "Godagari, Rajshahi", phone: "01630743003", facebook: "https://www.facebook.com/Forhad.pust.cse17", email: "forhad.af0@gmail.com", bloodGroup: "A+", photo: "https://res.cloudinary.com/dcwnn9c0u/image/upload/v1766240471/q0yjf87cg4pq3azoysp7.jpg"},
+            { id: 15, name: "MST. URMILA KHATUN", studentId: "250116", currentAddress: "Farida Tower", permanentAddress: "Naldanga, Natore", phone: "01626273480", facebook: "https://www.facebook.com/share/1AgvF7oeDv/", email: "urmilakhatun3456@gmail.com", bloodGroup: "B+", photo: "https://i.ibb.co.com/7t4GfHvW/155ff202-f119-43bf-96f2-e8d4b47dac7a.jpg"},
+            { id: 16, name: "MD. Forhad Zaman", studentId: "250117", currentAddress: "Homoepathic Medical Mor", permanentAddress: "Godagari, Rajshahi", phone: "01630743003", facebook: "https://www.facebook.com/Forhad.pust.cse17", email: "forhad.af0@gmail.com", bloodGroup: "A+", photo: "https://i.ibb.co.com/pvg7rxVJ/IMG-3578.jpg"},
             { id: 17, name: "MD.SOYAB HOSSAIN", studentId: "250119", currentAddress: "Mahtab Tower, Pabna", permanentAddress: "Sirajganj", phone: "01571054693", facebook: "https://www.facebook.com/profile.php?id=61578380370457", email: "soyab119678@gmail.com", bloodGroup: "B+", photo: "https://i.ibb.co.com/KjrJ0z7F/IMG-3595.jpg"},
-            { id: 18, name: "Asmaul Husna", studentId: "250120", currentAddress: "Rajapur, Pabna", permanentAddress: "Tangail", phone: "01743253000", facebook: "https://www.facebook.com/share/1C493KXREL/", email: "springshadow29@gmail.com", bloodGroup: "B+", photo: "https://res.cloudinary.com/dcwnn9c0u/image/upload/v1766163890/ktuzfunpnzxhbhqor9pe.jpg"},
-            { id: 19, name: "MD. NAHIDUL ISLAM", studentId: "250121", currentAddress: "Mohendropur, Pabna", permanentAddress: "Santhia, Pabna", phone: "01834145283", facebook: "https://www.facebook.com/nahidul.cse.pust", email: "nayeem5650@outlook.com", bloodGroup: "B+", photo: "https://res.cloudinary.com/dcwnn9c0u/image/upload/v1766158512/oflfhamin7sdor9m7syo.jpg"},
-            { id: 20, name:"Salauddin Ayyuve", studentId:"250122", currentAddress:"Mujahid Club", permanentAddress: "Shajadpure,Sirajganj ", phone: "01318856637", facebook: "https://www.facebook.com/share/17agXG6z6T/ ", email: "salauddinaiuve@gmail.com", bloodGroup: "B-", photo: "https://res.cloudinary.com/dcwnn9c0u/image/upload/v1766151639/eogujcllokxq90igrvqg.jpg"},
-            { id: 21, name: "Zahin Mahmud Daiyan", studentId: "250123", currentAddress: "Mahtab Tower, Pabna", permanentAddress: "Mohonpur, Natore", phone: "01701299258", facebook: "https://www.facebook.com/zahin.mahmud.daiyan.CSE.PUST", email: "zahinmahmuddaiyan271@gmail.com", bloodGroup: "O+", photo: "https://res.cloudinary.com/dcwnn9c0u/image/upload/v1766153355/dyaa4sw21ku0noarts5q.jpg"},
-            { id: 22, name: "Mst. Khandakar  Jahida", studentId: "250124", currentAddress: "Munsurabad, Pabna", permanentAddress: "Polastoli, Tangail", phone: "01303341680", facebook: "https://www.facebook.com/share/1FBAjWHw1W/", email: "mstkhandakerjahida@gmail", bloodGroup: "O+", photo: "https://res.cloudinary.com/dcwnn9c0u/image/upload/v1766243976/ppqmbqrtmdbesb1dtu6j.jpg"},
-            { id: 23, name: "SHAHID-HASAN-FAHIM", studentId: "250125", currentAddress: "Mujahid Club", permanentAddress: "Nilphamari", phone: "01720988987", facebook: "https://www.facebook.com/share/1HLGbwMiFn/", email: "shfahimf@gmail.com", bloodGroup: "o+", photo: "https://res.cloudinary.com/dcwnn9c0u/image/upload/v1766163197/fazeg798mpcjlw37nw1i.jpg"},
-            { id: 24, name: "Fatema", studentId: "250127", currentAddress: "Rajapur, Pabna", permanentAddress: "Mirzapur, Tangail ", email: "mdalommiya205@gmail", phone: "01605991240", bloodGroup: "AB+", facebook: "https://www.facebook.com/share/17nodFe5rp/", photo: "https://res.cloudinary.com/dcwnn9c0u/image/upload/v1766220166/hf7mti1ga5n8ncrmi1uq.jpg"},
-            { id: 25, name: "Mst.Soheli Aktar Akhi", studentId: "250128", currentAddress: "Degree Bot tola, Pabna", permanentAddress: "Bera,Pabna", phone: "01875768594", facebook: "https://www.facebook.com/share/1Adm7jw1kh/", email: "soheliakhi999@gmail.com ", bloodGroup: "AB+", photo: "https://res.cloudinary.com/dcwnn9c0u/image/upload/v1766163515/xngyl6q8eqfvnipe6ram.jpg"},
-            { id: 26, name: "Khandaker Saiful Islam Tanvir", studentId: "250130", currentAddress: "Mujahid Club", permanentAddress: "Muradnagar, Cumilla", phone: "01602032209", facebook: "https://www.facebook.com/share/1AXbodyPma/", email: "Khandakertanvir151@gmail.com ", bloodGroup: "B+", photo: "https://res.cloudinary.com/dcwnn9c0u/image/upload/v1766150081/ihvsrpvfrqmvhuhwwu9p.jpg"},
-            { id: 27, name: "Md. Riyaz Ali", studentId: " 250132", currentAddress: " Mujahid Club", permanentAddress: "Rajshahi", phone: "01751812046", facebook: " https://www.facebook.com/share/17wXYyanuL/", email: "mdriyazali531@gmail.com", bloodGroup: "O+", photo: "https://res.cloudinary.com/dcwnn9c0u/image/upload/v1766151474/gzbochse0bez3q1dxqk3.jpg"},
-            { id: 28, name: "Sahadat Hossain", studentId: "250133", currentAddress: "Mahtab Tower, Pabna", permanentAddress: "Narsingdi", phone: "01994728770", facebook: "https://www.facebook.com/share/1BDsbwm6Lg/", email: "sahadathossain8162@gmail.com", bloodGroup: "O+", photo: "https://res.cloudinary.com/dcwnn9c0u/image/upload/v1766241261/ix4jf0ccw1xxdyww9jkd.jpg"},
+            { id: 18, name: "Asmaul Husna", studentId: "250120", currentAddress: "Rajapur, Pabna", permanentAddress: "Tangail", phone: "01743253000", facebook: "https://www.facebook.com/share/1C493KXREL/", email: "springshadow29@gmail.com", bloodGroup: "B+", photo: "https://i.ibb.co.com/Kz8MHrWr/att-0hp-PR7z4-WQOTrt293pm-XV7-EWb-T26-SGs-Rhsb-ZOMj-PPg0.jpg"},
+            { id: 19, name: "MD. NAHIDUL ISLAM", studentId: "250121", currentAddress: "Mohendropur, Pabna", permanentAddress: "Santhia, Pabna", phone: "01834145283", facebook: "https://www.facebook.com/nahidul.cse.pust", email: "nayeem5650@outlook.com", bloodGroup: "B+", photo: "https://i.ibb.co.com/mCTPBwM6/fbc0d8ae-16d5-46fc-9353-2066456953ad.jpg"},
+            { id: 20, name:"Salauddin Ayyuve", studentId:"250122", currentAddress:"Mujahid Club", permanentAddress: "Shajadpure,Sirajganj ", phone: "01318856637", facebook: "https://www.facebook.com/share/17agXG6z6T/ ", email: "salauddinaiuve@gmail.com", bloodGroup: "B-", photo: "https://i.ibb.co.com/wZfKNsX6/477d429fd66df236ba92a46270e7b9d4.jpg"},
+            {id : 21, name : "Zahin Mahmud Daiyan", studentId : "250123", currentAddress : "Mahtab Tower, Pabna", permanentAddress : "Mohonpur, Natore", phone : "01701299258", facebook : "https://www.facebook.com/zahin.mahmud.daiyan.CSE.PUST", email : "zahinmahmuddaiyan271@gmail.com", bloodGroup : "O+", photo : "https://i.ibb.co.com/hRX7T65C/IMG-3538.jpg"},            { id: 22, name: "Mst. Khandakar  Jahida", studentId: "250124", currentAddress: "Munsurabad, Pabna", permanentAddress: "Polastoli, Tangail", phone: "01303341680", facebook: "https://www.facebook.com/share/1FBAjWHw1W/", email: "mstkhandakerjahida@gmail", bloodGroup: "O+", photo: "https://i.ibb.co.com/5xS6Gy7J/IMG-3587.jpg"},
+            { id: 23, name: "SHAHID-HASAN-FAHIM", studentId: "250125", currentAddress: "Mujahid Club", permanentAddress: "Nilphamari", phone: "01720988987", facebook: "https://www.facebook.com/share/1HLGbwMiFn/", email: "shfahimf@gmail.com", bloodGroup: "o+", photo: "https://i.ibb.co.com/Y7C5pXDJ/IMG-3535.jpg"},
+            { id: 24, name : "Fatema", studentId: "250127", currentAddress: "Rajapur, Pabna", permanentAddress : "Mirzapur, Tangail ", email : "mdalommiya205@gmail", phone: "01605991240", bloodGroup: "AB+", facebook : "https://www.facebook.com/share/17nodFe5rp/", photo: "https://i.ibb.co.com/fdxrnqkn/IMG-3565.jpg"},
+            { id: 25, name: "Mst.Soheli Aktar Akhi", studentId: "250128", currentAddress: "Degree Bot tola, Pabna" , permanentAddress: "Bera,Pabna", phone: "01875768594", facebook: "https://www.facebook.com/share/1Adm7jw1kh/", email: "soheliakhi999@gmail.com ", bloodGroup: "AB+", photo:"https://i.ibb.co.com/mrW07ccY/IMG-3554.jpg"},
+            { id: 26, name: "Khandaker Saiful Islam Tanvir", studentId: "250130", currentAddress: "Mujahid Club", permanentAddress: "Muradnagar, Cumilla", phone: "01602032209", facebook: "https://www.facebook.com/share/1AXbodyPma/", email: "Khandakertanvir151@gmail.com ", bloodGroup: "B+", photo: "https://i.ibb.co.com/5hc5PgvV/IMG-3530.jpg"},
+            { id: 27, name: "Md. Riyaz Ali", studentId: " 250132", currentAddress: " Mujahid Club", permanentAddress: "Rajshahi", phone: "01751812046", facebook: " https://www.facebook.com/share/17wXYyanuL/", email: "mdriyazali531@gmail.com", bloodGroup: "O+", photo: "https://i.ibb.co.com/fGMRnsgj/IMG-3533.jpg"},
+            { id: 28, name: "Sahadat Hossain", studentId: "250133", currentAddress: "Mahtab Tower, Pabna", permanentAddress: "Narsingdi", phone: "01994728770", facebook: "https://www.facebook.com/share/1BDsbwm6Lg/", email: "sahadathossain8162@gmail.com", bloodGroup: "O+", photo:"https://i.ibb.co.com/SXJSRnbp/IMG-3580.jpg"},
             { id: 29, name: "Jagojit Chandro Barmon (Niloy)", studentId: "250134", currentAddress: "Rothghor, Pabna", permanentAddress: "Kurigram", phone: "01737232248", facebook: "https://www.facebook.com/niloy.roy.327548", email: "jagojitchandro@gmail.com", bloodGroup: "B+", photo: "https://i.ibb.co.com/MD9hqp2z/8a8f5f2a-e6b3-43fa-8b83-1bb6ecb1dc6a.jpg"},
-            { id: 30, name: "Nuruzzaman Nahid", studentId: "250135", currentAddress: "Mujahid Club", permanentAddress: "Jhenaidah", phone: "01516582229", facebook: "https://www.facebook.com/share/1BuGmo5qHY/", email: "nahid3739u@gmail.com", bloodGroup: "B+", photo: "https://res.cloudinary.com/dcwnn9c0u/image/upload/v1766246961/ss30c9q09r9a7hi2u1hz.jpg"},
-            { id: 31, name: "Sameeha Zahan Mridula", studentId: "250136", currentAddress: "Mansurabad - 5, Pabna", permanentAddress: "Bera (North), Pabna", phone: "01950-377978", facebook: "https://www.facebook.com/sameeha.mridula", email: "sameehamridula@gmail.com", bloodGroup: "B+", photo: "https://res.cloudinary.com/dcwnn9c0u/image/upload/v1766162609/fycszgvvfw8tzfrthj8d.jpg"},
-            { id: 32, name: "Mohd. Atiquzzaman Atiq", studentId: "250137", currentAddress: "Mahtab Tower, Pabna", permanentAddress: "Chapainawabganj", phone: "01331945616", facebook: "https://www.facebook.com/profile.php?id=61578032794410", email: "ahmedatik5616@gmail.com", bloodGroup: "B+", photo: "https://res.cloudinary.com/dcwnn9c0u/image/upload/v1766247261/w7wmkthdohqmv9dx1xfo.jpg"},
-            { id: 33, name: "Samin Yesar Tousib ", studentId: "250138", currentAddress: "Mahtab Tower, Pabna", permanentAddress: "Guratipara Rangpur-5400", phone: "01318009252", facebook: "https://www.facebook.com/tousib.CSE.PUST", email: "tousibsaminyesar@gmail.com", bloodGroup: "AB+", photo: "https://res.cloudinary.com/dcwnn9c0u/image/upload/v1766161314/n7fvetmklv5i0th8s4el.jpg"},
-            { id: 34, name: "Md. Iftekar Rahman (Riad)", studentId: "250139", currentAddress: "Mujahid Club, Pabna", permanentAddress: "Rajshahi", phone: "01610077278", facebook: "https://www.facebook.com/share/1B5j9PeiVu/?mibextid=wwXIfr", email: "riadraj009@gmail.com", bloodGroup: "A+", photo: "https://res.cloudinary.com/dcwnn9c0u/image/upload/v1766160917/zxdiccvjzip6tobsj6vt.jpg" },
-            { id: 35, name: "Azizul Hoque Emon", studentId: "250140", currentAddress: "Homeopathy Moore", permanentAddress: "Cox's Bazar", phone: "01576688477", facebook: "https://www.facebook.com/profile.php?id=100074429367529", email: "azizulhoqueemon634@gmail.com", bloodGroup: "A+", photo: "https://res.cloudinary.com/dcwnn9c0u/image/upload/v1766228742/dued0vw2cxjcsbli9ghs.jpg"},
-            { id: 36, name: "Mst. Johura Khatun", studentId: "250141", currentAddress: "Rajapur, Pabna", permanentAddress: "Rajapur, Pabna", phone: "01752403522", facebook: "https://www.facebook.com/share/1DSpnpcvsY/", email: "fatematujjohura819@gmail.com", bloodGroup: "O+", photo: "https://i.ibb.co.com/6c5JCZzW/IMG-3597.jpg"}
+            { id: 30, name: "Nuruzzaman Nahid", studentId: "250135", currentAddress: "Mujahid Club", permanentAddress: "Jhenaidah", phone: "01516582229", facebook: "https://www.facebook.com/share/1BuGmo5qHY/", email: "nahid3739u@gmail.com", bloodGroup: "B+", photo: "https://i.ibb.co.com/HvtshpJ/IMG-3589.jpg"},
+            { id: 31, name: "Sameeha Zahan Mridula", studentId: "250136", currentAddress: "Mansurabad - 5, Pabna", permanentAddress: "Bera (North), Pabna", phone: "01950-377978", facebook: "https://www.facebook.com/sameeha.mridula", email: "sameehamridula@gmail.com", bloodGroup: "B+", photo: "https://i.ibb.co.com/Sw9SjzQZ/IMG-3552.jpg"},
+            { id: 32, name: "Mohd. Atiquzzaman Atiq", studentId: "250137", currentAddress: "Mahtab Tower, Pabna", permanentAddress: "Chapainawabganj", phone: "01331945616", facebook: "https://www.facebook.com/profile.php?id=61578032794410", email: "ahmedatik5616@gmail.com", bloodGroup: "B+", photo:"https://i.ibb.co.com/Q7mxsLYg/IMG-3591.jpg"},
+            { id: 33, name: "Samin Yesar Tousib ", studentId: "250138", currentAddress: "Mahtab Tower, Pabna", permanentAddress: "Guratipara Rangpur-5400", phone: "01318009252", facebook: "https://www.facebook.com/tousib.CSE.PUST", email: "tousibsaminyesar@gmail.com", bloodGroup: "AB+", photo: "https://i.ibb.co.com/WpKf38Tf/IMG-3550.jpg"},
+            { id: 34, name: "Md. Iftekar Rahman (Riad)", studentId: "250139", currentAddress: "Mujahid Club, Pabna", permanentAddress: "Rajshahi", phone: "01610077278", facebook: "https://www.facebook.com/share/1B5j9PeiVu/?mibextid=wwXIfr", email: "riadraj009@gmail.com", bloodGroup: "A+", photo: "https://i.ibb.co.com/xKvjx11D/IMG-2457.jpg" },
+            { id: 35, name: "Azizul Hoque Emon", studentId: "250140", currentAddress: "Homeopathy Moore", permanentAddress: "Cox's Bazar", phone: "01576688477", facebook: "https://www.facebook.com/profile.php?id=100074429367529", email: "azizulhoqueemon634@gmail.com", bloodGroup: "A+", photo: "https://i.ibb.co.com/8DMtgncZ/e85606f6-c293-4b97-9e7d-2da222c7bf0c.jpg"},
+            { id: 36, name: "Mst. Johura Khatun", studentId: "250141", currentAddress: "Rajapur, Pabna", permanentAddress: "Rajapur, Pabna", phone: "01752403522", facebook: "https://www.facebook.com/share/1DSpnpcvsY/",email: "fatematujjohura819@gmail.com", bloodGroup: "O+", photo: "https://i.ibb.co.com/6c5JCZzW/IMG-3597.jpg"}
         ];
 
         function getInitials(name) {
@@ -1035,15 +1673,6 @@
 
         function copyText(text) {
             navigator.clipboard.writeText(text).then(() => showToast(`${text} copied!`));
-        }
-
-        function showToast(message) {
-            const toast = document.getElementById("toast");
-            document.getElementById("toast-text").textContent = message;
-            toast.className = "toast show";
-            setTimeout(() => {
-                toast.className = toast.className.replace("show", "");
-            }, 2500);
         }
 
         function renderStudents(filter = "") {
@@ -1070,12 +1699,6 @@
                         <div class="student-info">
                             <div class="student-name">${student.name}</div>
                             <div class="student-id"><i class="fa-solid fa-id-card"></i> ${student.studentId}</div>
-                            ${student.session ? `
-                                <div class="info-item">
-                                    <i class="fa-solid fa-graduation-cap icon-session"></i>
-                                    <span>Session: ${student.session}</span>
-                                </div>
-                            ` : ''}
                             ${student.currentAddress ? `
                                 <div class="info-item">
                                     <i class="fa-solid fa-location-dot icon-current"></i>
@@ -1131,26 +1754,8 @@
             document.getElementById('totalCount').textContent = count;
         }
 
-        document.getElementById('search').addEventListener('input', (e) => {
-            renderStudents(e.target.value.toLowerCase());
-        });
-
-        function updateTime() {
-            const now = new Date();
-            document.getElementById('time').innerHTML = 
-                now.toLocaleTimeString() + "<br>" + 
-                now.toLocaleDateString(undefined, {
-                    weekday: 'short',
-                    month: 'short',
-                    day: 'numeric',
-                    year: 'numeric'
-                });
-        }
-
-        setInterval(updateTime, 1000);
-        updateTime();
-        renderStudents();
-        document.getElementById("year").textContent = new Date().getFullYear();
+        // Initialize on page load
+        document.addEventListener('DOMContentLoaded', checkLoginStatus);
     </script>
 </body>
 </html>
