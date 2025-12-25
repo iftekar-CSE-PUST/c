@@ -258,46 +258,7 @@
             display: none;
         }
 
-        /* Quick Actions Panel */
-        .quick-actions {
-            display: flex;
-            justify-content: center;
-            gap: 20px;
-            margin: 30px auto;
-            flex-wrap: wrap;
-        }
-
-        .action-btn {
-            background: linear-gradient(135deg, rgba(255, 255, 255, 0.2), rgba(255, 255, 255, 0.15));
-            backdrop-filter: blur(10px);
-            border-radius: 20px;
-            padding: 15px 25px;
-            color: white;
-            display: flex;
-            align-items: center;
-            gap: 12px;
-            border: 1px solid rgba(255, 255, 255, 0.2);
-            box-shadow: 0 8px 25px rgba(0, 0, 0, 0.2);
-            cursor: pointer;
-            transition: all 0.3s ease;
-            text-decoration: none;
-            font-weight: 600;
-            font-size: 1em;
-            border: none;
-            outline: none;
-        }
-
-        .action-btn:hover {
-            transform: translateY(-5px) scale(1.05);
-            box-shadow: 0 15px 35px rgba(0, 0, 0, 0.3);
-            background: linear-gradient(135deg, rgba(255, 255, 255, 0.25), rgba(255, 255, 255, 0.2));
-        }
-
-        .action-btn i {
-            font-size: 1.3em;
-        }
-
-        /* User Info Panel */
+        /* UPDATED: User Info Panel - Now inside header below time */
         .header-right-section {
             display: flex;
             flex-direction: column;
@@ -554,6 +515,11 @@
             box-shadow: 0 15px 40px rgba(0,0,0,0.3);
         }
 
+        @keyframes fadeIn {
+            from { opacity: 0; }
+            to { opacity: 1; }
+        }
+
         .search-box {
             max-width: 600px;
             margin: 0 auto 40px;
@@ -662,21 +628,20 @@
             text-transform: uppercase;
         }
 
-        /* SMALLER STUDENT CARDS */
         .student-grid {
             display: grid;
-            grid-template-columns: repeat(auto-fill, minmax(280px, 1fr));
-            gap: 25px;
-            padding: 25px;
+            grid-template-columns: repeat(auto-fill, minmax(360px, 1fr));
+            gap: 40px;
+            padding: 30px;
             margin-bottom: 60px;
         }
 
         .student-card {
             background: linear-gradient(135deg, rgba(255,255,255,0.98), rgba(255,255,255,0.95));
-            border-radius: 25px;
-            box-shadow: 0 12px 35px rgba(0,0,0,0.12);
+            border-radius: 35px;
+            box-shadow: 0 15px 45px rgba(0,0,0,0.15);
             overflow: hidden;
-            transition: all 0.4s cubic-bezier(0.4, 0, 0.2, 1);
+            transition: all 0.6s cubic-bezier(0.4, 0, 0.2, 1);
             position: relative;
             animation: cardFadeIn 0.8s cubic-bezier(0.4, 0, 0.2, 1) backwards;
             border: 2px solid rgba(255,255,255,0.6);
@@ -692,7 +657,7 @@
         @keyframes cardFadeIn {
             from {
                 opacity: 0;
-                transform: translateY(30px) scale(0.95);
+                transform: translateY(50px) scale(0.9);
             }
             to {
                 opacity: 1;
@@ -706,13 +671,13 @@
             top: 0;
             left: 0;
             width: 100%;
-            height: 5px;
+            height: 7px;
             background: linear-gradient(90deg, #667eea, #764ba2, #f093fb, #ff6b6b, #667eea);
             background-size: 300% 100%;
             animation: gradientSlide 4s linear infinite;
             transform: scaleX(0);
-            transition: transform 0.4s cubic-bezier(0.4, 0, 0.2, 1);
-            border-radius: 25px 25px 0 0;
+            transition: transform 0.6s cubic-bezier(0.4, 0, 0.2, 1);
+            border-radius: 35px 35px 0 0;
         }
 
         @keyframes gradientSlide {
@@ -725,23 +690,23 @@
         }
 
         .student-card:hover {
-            transform: translateY(-10px) scale(1.02);
-            box-shadow: 0 20px 50px rgba(0,0,0,0.2);
+            transform: translateY(-20px) scale(1.03);
+            box-shadow: 0 30px 70px rgba(0,0,0,0.25);
         }
 
         .photo-container {
             position: relative;
             overflow: hidden;
-            height: 220px;
+            height: 320px;
             background: linear-gradient(135deg, #667eea, #764ba2);
-            border-radius: 25px 25px 0 0;
+            border-radius: 35px 35px 0 0;
         }
 
         .student-photo, .initials {
             width: 100%;
             height: 100%;
             object-fit: cover;
-            transition: transform 0.5s cubic-bezier(0.4, 0, 0.2, 1);
+            transition: transform 0.6s cubic-bezier(0.4, 0, 0.2, 1);
         }
 
         .initials {
@@ -749,18 +714,18 @@
             display: flex;
             align-items: center;
             justify-content: center;
-            font-size: 3.5em;
+            font-size: 5em;
             font-weight: 900;
             color: white;
-            text-shadow: 0 6px 15px rgba(0,0,0,0.3);
+            text-shadow: 0 8px 20px rgba(0,0,0,0.3);
         }
 
         .student-card:hover .student-photo {
-            transform: scale(1.12) rotate(2deg);
+            transform: scale(1.18) rotate(3deg);
         }
 
         .student-card:hover .initials {
-            transform: scale(1.05);
+            transform: scale(1.1);
         }
 
         .photo-overlay {
@@ -769,9 +734,9 @@
             left: 0;
             width: 100%;
             height: 100%;
-            background: linear-gradient(to bottom, transparent 0%, rgba(0,0,0,0.6) 100%);
+            background: linear-gradient(to bottom, transparent 0%, rgba(0,0,0,0.7) 100%);
             opacity: 0;
-            transition: opacity 0.5s cubic-bezier(0.4, 0, 0.2, 1);
+            transition: opacity 0.6s cubic-bezier(0.4, 0, 0.2, 1);
         }
 
         .student-card:hover .photo-overlay {
@@ -779,72 +744,72 @@
         }
 
         .student-info {
-            padding: 22px;
+            padding: 32px;
         }
 
         .student-name {
-            font-size: 1.2em;
-            font-weight: 800;
+            font-size: 1.4em;
+            font-weight: 900;
             background: linear-gradient(135deg, #667eea, #764ba2);
             -webkit-background-clip: text;
             -webkit-text-fill-color: transparent;
             background-clip: text;
-            margin-bottom: 12px;
+            margin-bottom: 16px;
             text-align: center;
             text-transform: uppercase;
-            letter-spacing: 0.3px;
+            letter-spacing: 0.5px;
             transition: all 0.3s ease;
         }
 
         .student-card:hover .student-name {
-            letter-spacing: 0.5px;
+            letter-spacing: 1px;
         }
 
         .student-id {
             color: white;
-            font-size: 0.95em;
-            margin-bottom: 16px;
-            padding: 10px 18px;
+            font-size: 1.05em;
+            margin-bottom: 20px;
+            padding: 12px 24px;
             background: linear-gradient(135deg, #667eea, #764ba2);
-            border-radius: 25px;
+            border-radius: 35px;
             display: inline-block;
-            font-weight: 700;
-            box-shadow: 0 6px 15px rgba(102,126,234,0.3);
-            transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+            font-weight: 800;
+            box-shadow: 0 8px 20px rgba(102,126,234,0.4);
+            transition: all 0.4s cubic-bezier(0.4, 0, 0.2, 1);
         }
 
         .student-card:hover .student-id {
-            transform: translateY(-2px);
-            box-shadow: 0 8px 20px rgba(102,126,234,0.4);
+            transform: translateY(-3px);
+            box-shadow: 0 12px 30px rgba(102,126,234,0.5);
         }
 
         .info-item {
             display: flex;
             align-items: center;
-            gap: 10px;
-            margin: 10px 0;
-            font-size: 0.9em;
+            gap: 12px;
+            margin: 12px 0;
+            font-size: 1em;
             color: #444;
             flex-wrap: wrap;
-            padding: 8px 12px;
-            border-radius: 15px;
-            transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+            padding: 10px 15px;
+            border-radius: 20px;
+            transition: all 0.4s cubic-bezier(0.4, 0, 0.2, 1);
             font-weight: 500;
         }
 
         .info-item:hover {
-            background: rgba(102,126,234,0.08);
-            transform: translateX(5px);
+            background: rgba(102,126,234,0.1);
+            transform: translateX(8px);
         }
 
         .info-item i {
-            width: 20px;
-            font-size: 1em;
+            width: 22px;
+            font-size: 1.15em;
             transition: transform 0.3s ease;
         }
 
         .info-item:hover i {
-            transform: scale(1.1);
+            transform: scale(1.2);
         }
 
         .info-item a {
@@ -870,51 +835,51 @@
             background: linear-gradient(135deg, #667eea, #764ba2);
             cursor: pointer;
             color: white;
-            padding: 6px 10px;
-            border-radius: 12px;
-            transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
-            font-size: 0.85em;
+            padding: 8px 12px;
+            border-radius: 15px;
+            transition: all 0.4s cubic-bezier(0.4, 0, 0.2, 1);
+            font-size: 0.95em;
         }
 
         .copy-btn:hover {
-            transform: scale(1.1) rotate(3deg);
-            box-shadow: 0 6px 15px rgba(102,126,234,0.4);
+            transform: scale(1.15) rotate(5deg);
+            box-shadow: 0 8px 20px rgba(102,126,234,0.5);
         }
 
         .toast {
             visibility: hidden;
-            min-width: 280px;
+            min-width: 300px;
             background: linear-gradient(135deg, #2d3436, #000000);
             color: #fff;
             text-align: center;
-            border-radius: 20px;
-            padding: 18px 25px;
+            border-radius: 25px;
+            padding: 20px 30px;
             position: fixed;
             left: 50%;
             bottom: 30px;
             transform: translateX(-50%);
-            font-size: 15px;
+            font-size: 16px;
             z-index: 9999;
             opacity: 0;
-            transition: all 0.5s cubic-bezier(0.68, -0.55, 0.265, 1.55);
+            transition: all 0.6s cubic-bezier(0.68, -0.55, 0.265, 1.55);
             display: flex;
             align-items: center;
             justify-content: center;
-            gap: 12px;
-            box-shadow: 0 12px 40px rgba(0,0,0,0.4);
+            gap: 15px;
+            box-shadow: 0 15px 50px rgba(0,0,0,0.5);
             border: 2px solid rgba(255,255,255,0.15);
-            font-weight: 600;
+            font-weight: 700;
         }
 
         .toast.show {
             visibility: visible;
             opacity: 1;
-            bottom: 60px;
+            bottom: 70px;
         }
 
         .toast i {
             color: #26de81;
-            font-size: 1.3em;
+            font-size: 1.5em;
             animation: checkPop 0.5s cubic-bezier(0.68, -0.55, 0.265, 1.55);
         }
 
@@ -928,17 +893,17 @@
             background: linear-gradient(135deg, #2c3e50 0%, #34495e 50%, #2c3e50 100%);
             color: white;
             text-align: center;
-            padding: 40px 25px;
+            padding: 45px 30px;
             position: relative;
             overflow: hidden;
             margin-top: 60px;
-            border-radius: 30px 30px 0 0;
+            border-radius: 35px 35px 0 0;
         }
 
         footer::before {
             content: '💻';
             position: absolute;
-            font-size: 160px;
+            font-size: 180px;
             opacity: 0.05;
             top: 50%;
             left: 50%;
@@ -951,7 +916,7 @@
             opacity: 0.95;
             position: relative;
             z-index: 2;
-            font-size: 1em;
+            font-size: 1.1em;
             font-weight: 600;
             transition: all 0.3s ease;
         }
@@ -974,296 +939,6 @@
             width: 160px;
         }
 
-        /* Announcement Modal Styles */
-        .announcement-modal,
-        .privacy-modal,
-        .terms-modal,
-        .contact-modal {
-            display: none;
-            position: fixed;
-            top: 0;
-            left: 0;
-            width: 100%;
-            height: 100%;
-            background: rgba(0, 0, 0, 0.92);
-            z-index: 9998;
-            justify-content: center;
-            align-items: center;
-            padding: 20px;
-            backdrop-filter: blur(10px);
-        }
-
-        .announcement-content,
-        .privacy-content,
-        .terms-content,
-        .contact-content {
-            background: linear-gradient(135deg, #1a3a8f, #2d5cc2);
-            border-radius: 25px;
-            max-width: 1100px;
-            width: 95%;
-            max-height: 90vh;
-            overflow-y: auto;
-            color: white;
-            box-shadow: 0 25px 75px rgba(0, 0, 0, 0.5);
-            border: 1px solid rgba(255, 255, 255, 0.1);
-            position: relative;
-        }
-
-        .privacy-content {
-            background: linear-gradient(135deg, #2c3e50, #34495e);
-        }
-
-        .terms-content {
-            background: linear-gradient(135deg, #0c2461, #1e3799);
-        }
-
-        .contact-content {
-            background: linear-gradient(135deg, #006266, #009432);
-        }
-
-        .announcement-modal-header,
-        .privacy-modal-header,
-        .terms-modal-header,
-        .contact-modal-header {
-            padding: 25px 30px;
-            background: rgba(0, 0, 0, 0.2);
-            border-bottom: 1px solid rgba(255, 255,255, 0.1);
-            display: flex;
-            justify-content: space-between;
-            align-items: center;
-        }
-
-        .announcement-modal-header h2,
-        .privacy-modal-header h2,
-        .terms-modal-header h2,
-        .contact-modal-header h2 {
-            margin: 0;
-            font-size: 1.8em;
-            display: flex;
-            align-items: center;
-            gap: 15px;
-        }
-
-        .announcement-modal-header h2 i {
-            color: #f1c40f;
-        }
-
-        .privacy-modal-header h2 i {
-            color: #3498db;
-        }
-
-        .terms-modal-header h2 i {
-            color: #e74c3c;
-        }
-
-        .contact-modal-header h2 i {
-            color: #2ecc71;
-        }
-
-        .close-announcement,
-        .close-privacy,
-        .close-terms,
-        .close-contact {
-            background: rgba(255, 255, 255, 0.1);
-            border: none;
-            color: white;
-            width: 45px;
-            height: 45px;
-            border-radius: 50%;
-            cursor: pointer;
-            font-size: 1.2em;
-            display: flex;
-            align-items: center;
-            justify-content: center;
-            transition: all 0.3s ease;
-        }
-
-        .close-announcement:hover,
-        .close-privacy:hover,
-        .close-terms:hover,
-        .close-contact:hover {
-            background: rgba(255, 255, 255, 0.2);
-            transform: rotate(90deg);
-        }
-
-        .announcement-modal-body,
-        .privacy-modal-body,
-        .terms-modal-body,
-        .contact-modal-body {
-            padding: 30px;
-        }
-
-        .university-header {
-            text-align: center;
-            margin-bottom: 30px;
-            padding-bottom: 20px;
-            border-bottom: 2px solid rgba(255, 255, 255, 0.1);
-        }
-
-        .university-header h3 {
-            font-size: 1.8em;
-            margin-bottom: 8px;
-            color: #f1f3f9;
-        }
-
-        .university-header p {
-            font-size: 1.1em;
-            opacity: 0.9;
-            line-height: 1.6;
-        }
-
-        .announcement-info-box {
-            background: rgba(255, 255, 255, 0.1);
-            border-radius: 15px;
-            padding: 20px;
-            margin-bottom: 30px;
-            border-left: 5px solid #f1c40f;
-        }
-
-        .announcement-info-box h4 {
-            margin-top: 0;
-            margin-bottom: 15px;
-            color: #f1c40f;
-            font-size: 1.3em;
-        }
-
-        .announcement-image-container {
-            overflow-x: auto;
-            margin-bottom: 30px;
-            border-radius: 15px;
-            border: 1px solid rgba(255, 255, 255, 0.1);
-            background: rgba(0, 0, 0, 0.2);
-            text-align: center;
-            padding: 20px;
-        }
-
-        .announcement-image {
-            max-width: 100%;
-            height: auto;
-            border-radius: 10px;
-            box-shadow: 0 10px 30px rgba(0, 0, 0, 0.5);
-            display: block;
-            margin: 0 auto;
-        }
-
-        .announcement-notice {
-            background: rgba(231, 76, 60, 0.15);
-            border-radius: 15px;
-            padding: 20px;
-            margin-top: 30px;
-            border-left: 5px solid #e74c3c;
-        }
-
-        .announcement-notice p {
-            margin: 0;
-            font-size: 1.05em;
-            line-height: 1.6;
-        }
-
-        .announcement-footer {
-            margin-top: 30px;
-            padding-top: 20px;
-            border-top: 1px solid rgba(255, 255, 255, 0.1);
-            text-align: center;
-            font-size: 0.95em;
-            opacity: 0.8;
-        }
-
-        /* Policy and Terms Content Styles */
-        .policy-section {
-            background: rgba(255, 255, 255, 0.05);
-            border-radius: 15px;
-            padding: 20px;
-            margin-bottom: 25px;
-            border-left: 4px solid #3498db;
-        }
-
-        .policy-section h4 {
-            color: #3498db;
-            margin-bottom: 15px;
-            font-size: 1.3em;
-        }
-
-        .policy-section p,
-        .policy-section ul {
-            margin-bottom: 10px;
-            line-height: 1.6;
-        }
-
-        .policy-section ul {
-            padding-left: 20px;
-        }
-
-        .policy-section li {
-            margin-bottom: 8px;
-        }
-
-        .contact-info {
-            display: grid;
-            grid-template-columns: repeat(auto-fit, minmax(300px, 1fr));
-            gap: 20px;
-            margin-top: 30px;
-        }
-
-        .contact-item {
-            background: rgba(255, 255, 255, 0.1);
-            padding: 20px;
-            border-radius: 15px;
-            text-align: center;
-            transition: transform 0.3s ease;
-        }
-
-        .contact-item:hover {
-            transform: translateY(-5px);
-            background: rgba(255, 255, 255, 0.15);
-        }
-
-        .contact-item i {
-            font-size: 2em;
-            margin-bottom: 15px;
-            color: #2ecc71;
-        }
-
-        .contact-item h4 {
-            margin-bottom: 10px;
-            color: #f1c40f;
-        }
-
-        .contact-item a {
-            color: #48dbfb;
-            text-decoration: none;
-            transition: color 0.3s;
-        }
-
-        .contact-item a:hover {
-            color: #fff;
-            text-decoration: underline;
-        }
-
-        /* Footer Links */
-        .footer-links {
-            display: flex;
-            justify-content: center;
-            gap: 25px;
-            margin: 20px 0;
-            flex-wrap: wrap;
-        }
-
-        .footer-links a {
-            color: #f093fb;
-            text-decoration: none;
-            font-weight: 600;
-            transition: all 0.3s ease;
-            padding: 8px 15px;
-            border-radius: 20px;
-            background: rgba(255, 255, 255, 0.1);
-        }
-
-        .footer-links a:hover {
-            background: rgba(255, 255, 255, 0.2);
-            transform: translateY(-3px);
-        }
-
         @media (max-width: 768px) {
             .hero-section h1 {
                 font-size: 2.5em;
@@ -1271,25 +946,8 @@
             }
 
             .student-grid {
-                grid-template-columns: repeat(auto-fill, minmax(250px, 1fr));
-                gap: 20px;
-                padding: 20px;
-            }
-
-            .photo-container {
-                height: 200px;
-            }
-
-            .student-info {
-                padding: 18px;
-            }
-
-            .student-name {
-                font-size: 1.1em;
-            }
-
-            .info-item {
-                font-size: 0.85em;
+                grid-template-columns: repeat(auto-fill, minmax(300px, 1fr));
+                gap: 30px;
             }
 
             header {
@@ -1333,6 +991,7 @@
                 font-size: 1.8em;
             }
 
+            /* Mobile responsive for user-info */
             .user-info {
                 gap: 8px;
                 padding: 6px 10px;
@@ -1348,74 +1007,14 @@
                 padding: 5px 8px;
                 font-size: 0.8em;
             }
-
-            .quick-actions {
-                gap: 10px;
-            }
-
-            .action-btn {
-                padding: 12px 20px;
-                font-size: 0.9em;
-            }
-
-            .announcement-content,
-            .privacy-content,
-            .terms-content,
-            .contact-content {
-                padding: 15px;
-            }
-
-            .announcement-modal-header,
-            .privacy-modal-header,
-            .terms-modal-header,
-            .contact-modal-header {
-                padding: 20px;
-            }
-
-            .announcement-modal-header h2,
-            .privacy-modal-header h2,
-            .terms-modal-header h2,
-            .contact-modal-header h2 {
-                font-size: 1.5em;
-            }
-
-            .announcement-image-container {
-                padding: 10px;
-            }
-
-            .footer-links {
-                gap: 15px;
-            }
-
-            .footer-links a {
-                padding: 6px 12px;
-                font-size: 0.9em;
-            }
         }
 
-        @media (max-width: 480px) {
-            .student-grid {
-                grid-template-columns: 1fr;
-            }
-            
-            .photo-container {
-                height: 180px;
-            }
-            
-            .stats {
-                padding: 30px;
-                margin: 20px auto 40px;
-            }
-            
-            .stats h2 {
-                font-size: 3.5em;
-            }
-        }
-
+        /* Smooth scroll behavior */
         html {
             scroll-behavior: smooth;
         }
 
+        /* Selection styling */
         ::selection {
             background: linear-gradient(135deg, #667eea, #764ba2);
             color: white;
@@ -1455,6 +1054,7 @@
                     Invalid credentials. Please try again!
                 </div>
                 
+                <!-- UPDATED: Cleaned up login info -->
                 <div class="login-info">
                     <p><strong>Contact administrator for login credentials</strong></p>
                 </div>
@@ -1482,6 +1082,7 @@
                 </div>
                 <div class="header-right-section">
                     <div class="time" id="time"></div>
+                    <!-- User Info Panel (Visible after login) - Now below time -->
                     <div class="user-info" id="userInfo" style="display: none;">
                         <div class="user-avatar" id="userAvatar">C</div>
                         <button class="logout-btn" id="logoutBtn">
@@ -1495,15 +1096,6 @@
                 <h1>CSE Department Students</h1>
                 <div class="session-info">
                     <strong>Session:</strong> 2024-2025
-                </div>
-                
-                <div class="quick-actions">
-                    <a href="https://pust.ac.bd/academic/departments/dept_teachers/D01" target="_blank" class="action-btn">
-                        <i class="fas fa-chalkboard-teacher"></i> Teachers Zone
-                    </a>
-                    <button class="action-btn" id="announcementBtn">
-                        <i class="fas fa-bullhorn"></i> Announcement
-                    </button>
                 </div>
                 
                 <div class="search-box">
@@ -1520,16 +1112,9 @@
             <div class="student-grid" id="studentGrid"></div>
 
             <footer>
-                <p>&copy; <span id="year"></span> Pabna University of Science & Technology || All rights reserved.</p>
+                <p>&copy; <span id="year"></span> Pabna University of Science & Technology. All rights reserved.</p>
                 <div class="footer-divider"></div>
                 <p>Computer Science & Engineering Department</p>
-                
-                <!-- Footer Links -->
-                <div class="footer-links">
-                    <a href="#" id="privacyLink"><i class="fas fa-shield-alt"></i> Privacy Policy</a>
-                    <a href="#" id="termsLink"><i class="fas fa-file-contract"></i> Terms of Use</a>
-                    <a href="#" id="contactLink"><i class="fas fa-envelope"></i> Contact Us</a>
-                </div>
             </footer>
         </div>
 
@@ -1537,289 +1122,10 @@
             <i class="fa-solid fa-check-circle"></i>
             <span id="toast-text"></span>
         </div>
-
-        <!-- Announcement Modal -->
-        <div id="announcementModal" class="announcement-modal">
-            <div class="announcement-content">
-                <div class="announcement-modal-header">
-                    <h2><i class="fas fa-bullhorn"></i> Important Announcement</h2>
-                    <button class="close-announcement" id="closeAnnouncement">
-                        <i class="fas fa-times"></i>
-                    </button>
-                </div>
-                
-                <div class="announcement-modal-body">
-                    <div class="university-header">
-                        <p style="margin-top: 15px;"></p>
-                    </div>
-                    
-                    <div class="announcement-info-box">
-                        <h4>B. Sc Engineering 1<sup>st</sup> Year 1<sup>st</sup> Semester Examination-2025</h4>
-                        <p><strong>Session:</strong> 2024-25</p>
-                        <p><strong>Note:</strong> Semester Final Examination will start from 6th January, 2026. All students are requested to prepare accordingly and maintain the exam schedule strictly.</p>
-                    </div>
-                    
-                    <div class="announcement-image-container">
-                        <img src="https://i.ibb.co.com/BFKW8fv/att-ma-FUVD93-AMe-W-x51z8xkz-EA0-MPd-Z-OLBLh2-H2fy-R-A.jpg" alt="Exam Schedule Announcement" class="announcement-image">
-                    </div>
-                    
-                    <div class="announcement-notice">
-                        <p><strong>Important Notice:</strong> All examinations will be held at the CSE Department. Students must bring their ID cards and admit cards. Please arrive at least 30 minutes before the exam starts. Mobile phones are strictly prohibited in the examination hall.</p>
-                    </div>
-                    
-                    <div class="announcement-footer">
-                    </div>
-                </div>
-            </div>
-        </div>
-
-        <!-- Privacy Policy Modal -->
-        <div id="privacyModal" class="privacy-modal">
-            <div class="privacy-content">
-                <div class="privacy-modal-header">
-                    <h2><i class="fas fa-shield-alt"></i> Privacy Policy</h2>
-                    <button class="close-privacy" id="closePrivacy">
-                        <i class="fas fa-times"></i>
-                    </button>
-                </div>
-                
-                <div class="privacy-modal-body">
-                    <div class="university-header">
-                        <h3>Department of Computer Science and Engineering</h3>
-                        <p>Pabna University of Science and Technology<br>
-                        <strong>Privacy Policy</strong><br></p>
-                    </div>
-                    
-                    <div class="policy-section">
-                        <h4>1. Information We Collect</h4>
-                        <p>This website collects the following information:</p>
-                        <ul>
-                            <li>Login credentials (username and password) for authentication</li>
-                            <li>User session data stored locally (login status, username)</li>
-                            <li>No personal data is transmitted to external servers</li>
-                        </ul>
-                    </div>
-                    
-                    <div class="policy-section">
-                        <h4>2. How We Use Information</h4>
-                        <ul>
-                            <li>Login credentials are used solely for authentication purposes</li>
-                            <li>Session data is stored locally in your browser to maintain login state</li>
-                            <li>No personal information is shared, sold, or distributed to third parties</li>
-                        </ul>
-                    </div>
-                    
-                    <div class="policy-section">
-                        <h4>3. Data Storage & Security</h4>
-                        <ul>
-                            <li>Passwords are encoded using Base64 (for demonstration purposes only)</li>
-                            <li>User session data is stored in browser's localStorage</li>
-                            <li>All student data displayed is publicly available departmental information</li>
-                            <li>No sensitive personal data is collected or stored on our servers</li>
-                        </ul>
-                    </div>
-                    
-                    <div class="policy-section">
-                        <h4>4. Student Directory Information</h4>
-                        <p>The student directory displays:</p>
-                        <ul>
-                            <li>Publicly available student information (name, ID, contact details)</li>
-                            <li>Photos and information provided by students for departmental use</li>
-                            <li>This information is accessible only to authenticated users</li>
-                        </ul>
-                    </div>
-                    
-                    <div class="policy-section">
-                        <h4>5. Third-Party Services</h4>
-                        <ul>
-                            <li>Font Awesome icons via CDN</li>
-                            <li>No analytics or tracking services are used</li>
-                            <li>External links (Facebook, university website) open in new tabs</li>
-                        </ul>
-                    </div>
-                    
-                    <div class="policy-section">
-                        <h4>6. Your Rights</h4>
-                        <ul>
-                            <li>You can logout at any time to clear session data</li>
-                            <li>You can clear browser storage to remove any stored data</li>
-                            <li>No personal account deletion is needed as no personal data is stored</li>
-                        </ul>
-                    </div>
-                    
-                    <div class="policy-section">
-                        <h4>7. Changes to Privacy Policy</h4>
-                        <p>We may update this privacy policy periodically. Continued use of the website constitutes acceptance of any changes.</p>
-                    </div>
-                </div>
-            </div>
-        </div>
-
-        <!-- Terms of Use Modal -->
-        <div id="termsModal" class="terms-modal">
-            <div class="terms-content">
-                <div class="terms-modal-header">
-                    <h2><i class="fas fa-file-contract"></i> Terms of Use</h2>
-                    <button class="close-terms" id="closeTerms">
-                        <i class="fas fa-times"></i>
-                    </button>
-                </div>
-                
-                <div class="terms-modal-body">
-                    <div class="university-header">
-                        <h3>Department of Computer Science and Engineering</h3>
-                        <p>Pabna University of Science and Technology<br>
-                        <strong>Terms of Use</strong><br></p>
-                    </div>
-                    
-                    <div class="policy-section">
-                        <h4>1. Acceptance of Terms</h4>
-                        <p>By accessing and using this website, you agree to these Terms of Use.</p>
-                    </div>
-                    
-                    <div class="policy-section">
-                        <h4>2. Authorized Use</h4>
-                        <p>This website is intended for:</p>
-                        <ul>
-                            <li>Current CSE department students of PUST (Batch 17th)</li>
-                            <li>Authorized faculty and staff</li>
-                            <li>Administrative purposes only</li>
-                        </ul>
-                    </div>
-                    
-                    <div class="policy-section">
-                        <h4>3. User Responsibilities</h4>
-                        <p>You agree to:</p>
-                        <ul>
-                            <li>Keep login credentials confidential</li>
-                            <li>Not share access with unauthorized individuals</li>
-                            <li>Use the information only for legitimate academic purposes</li>
-                            <li>Not misuse or distribute student information</li>
-                        </ul>
-                    </div>
-                    
-                    <div class="policy-section">
-                        <h4>4. Prohibited Activities</h4>
-                        <p>You must not:</p>
-                        <ul>
-                            <li>Attempt to bypass authentication</li>
-                            <li>Scrape or collect data systematically</li>
-                            <li>Use information for commercial purposes</li>
-                            <li>Harass or contact students for non-academic reasons</li>
-                            <li>Modify or tamper with website functionality</li>
-                        </ul>
-                    </div>
-                    
-                    <div class="policy-section">
-                        <h4>5. Intellectual Property</h4>
-                        <ul>
-                            <li>Website design and code are property of PUST CSE Department</li>
-                            <li>Student photos and information are used with permission</li>
-                            <li>University logos and branding are protected</li>
-                        </ul>
-                    </div>
-                    
-                    <div class="policy-section">
-                        <h4>6. Disclaimer of Warranty</h4>
-                        <ul>
-                            <li>Information is provided "as is"</li>
-                            <li>We strive for accuracy but don't guarantee error-free data</li>
-                            <li>Contact individual students to verify information</li>
-                        </ul>
-                    </div>
-                    
-                    <div class="policy-section">
-                        <h4>7. Limitation of Liability</h4>
-                        <p>The CSE Department is not liable for:</p>
-                        <ul>
-                            <li>Technical issues or downtime</li>
-                            <li>Incorrect or outdated information</li>
-                            <li>Unauthorized access due to credential sharing</li>
-                            <li>Third-party website content (Facebook links, etc.)</li>
-                        </ul>
-                    </div>
-                    
-                    <div class="policy-section">
-                        <h4>8. Account Security</h4>
-                        <ul>
-                            <li>You are responsible for maintaining login security</li>
-                            <li>Report suspected unauthorized access immediately</li>
-                            <li>Logout when using shared computers</li>
-                        </ul>
-                    </div>
-                    
-                    <div class="policy-section">
-                        <h4>9. Changes to Terms</h4>
-                        <p>We may update these terms without notice. Continued use constitutes acceptance.</p>
-                    </div>
-                    
-                    <div class="policy-section">
-                        <h4>10. Governing Law</h4>
-                        <p>These terms are governed by Bangladesh law and PUST policies.</p>
-                    </div>
-                </div>
-            </div>
-        </div>
-
-        <!-- Contact Us Modal -->
-        <div id="contactModal" class="contact-modal">
-            <div class="contact-content">
-                <div class="contact-modal-header">
-                    <h2><i class="fas fa-envelope"></i> Contact Us</h2>
-                    <button class="close-contact" id="closeContact">
-                        <i class="fas fa-times"></i>
-                    </button>
-                </div>
-                
-                <div class="contact-modal-body">
-                    <div class="university-header">
-                        <h3>Department of Computer Science and Engineering</h3>
-                        <p>Pabna University of Science and Technology</p>
-                    </div>
-                    
-                    <div class="contact-info">
-                        <div class="contact-item">
-                            <i class="fas fa-phone"></i>
-                            <h4>Phone</h4>
-                            <p>01610077278<br></p>
-                        </div>
-                        
-                        <div class="contact-item">
-                            <i class="fas fa-envelope"></i>
-                            <h4>Email</h4>
-                            <p>
-                                <a href="mailto:riadraj009@gmail.com">riadraj009@gmail.com</a>
-                            </p>
-                        </div>
-                    </div>
-                    
-                    <div class="policy-section">
-                        <h4>For Technical Support</h4>
-                        <p>If you encounter any technical issues with this website:</p>
-                        <ul>
-                            <li>Check your internet connection</li>
-                            <li>Clear browser cache and cookies</li>
-                            <li>Try using a different browser</li>
-                            <li>Contact your batch representative</li>
-                        </ul>
-                    </div>
-                    
-                    <div class="policy-section">
-                        <h4>For Login Issues</h4>
-                        <p>If you cannot login or forgot your credentials:</p>
-                        <ul>
-                            <li>Contact your batch representative</li>
-                            <li>Visit the CSE department office</li>
-                            <li>Credentials are managed by batch representative</li>
-                        </ul>
-                    </div>
-                </div>
-            </div>
-        </div>
     </div>
 
     <script>
-        // Database of valid users
+        // Database of valid users - Now only one user with encrypted password
         const validUsers = [
             { 
                 username: 'cse17', 
@@ -1841,22 +1147,6 @@
         const loginError = document.getElementById('loginError');
         const logoutBtn = document.getElementById('logoutBtn');
         const currentYear = new Date().getFullYear();
-        const announcementBtn = document.getElementById('announcementBtn');
-        const announcementModal = document.getElementById('announcementModal');
-        const closeAnnouncement = document.getElementById('closeAnnouncement');
-        
-        // New modal elements
-        const privacyLink = document.getElementById('privacyLink');
-        const privacyModal = document.getElementById('privacyModal');
-        const closePrivacy = document.getElementById('closePrivacy');
-        
-        const termsLink = document.getElementById('termsLink');
-        const termsModal = document.getElementById('termsModal');
-        const closeTerms = document.getElementById('closeTerms');
-        
-        const contactLink = document.getElementById('contactLink');
-        const contactModal = document.getElementById('contactModal');
-        const closeContact = document.getElementById('closeContact');
 
         // Check if user is already logged in
         function checkLoginStatus() {
@@ -1976,88 +1266,9 @@
             document.getElementById('search').addEventListener('input', (e) => {
                 renderStudents(e.target.value.toLowerCase());
             });
-            
-            // Initialize all modals
-            initializeModals();
         }
 
-        // Initialize all modals
-        function initializeModals() {
-            // Announcement modal
-            announcementBtn.addEventListener('click', () => {
-                announcementModal.style.display = 'flex';
-            });
-            
-            closeAnnouncement.addEventListener('click', () => {
-                announcementModal.style.display = 'none';
-            });
-            
-            announcementModal.addEventListener('click', (e) => {
-                if (e.target === announcementModal) {
-                    announcementModal.style.display = 'none';
-                }
-            });
-            
-            // Privacy Policy modal
-            privacyLink.addEventListener('click', (e) => {
-                e.preventDefault();
-                privacyModal.style.display = 'flex';
-            });
-            
-            closePrivacy.addEventListener('click', () => {
-                privacyModal.style.display = 'none';
-            });
-            
-            privacyModal.addEventListener('click', (e) => {
-                if (e.target === privacyModal) {
-                    privacyModal.style.display = 'none';
-                }
-            });
-            
-            // Terms of Use modal
-            termsLink.addEventListener('click', (e) => {
-                e.preventDefault();
-                termsModal.style.display = 'flex';
-            });
-            
-            closeTerms.addEventListener('click', () => {
-                termsModal.style.display = 'none';
-            });
-            
-            termsModal.addEventListener('click', (e) => {
-                if (e.target === termsModal) {
-                    termsModal.style.display = 'none';
-                }
-            });
-            
-            // Contact Us modal
-            contactLink.addEventListener('click', (e) => {
-                e.preventDefault();
-                contactModal.style.display = 'flex';
-            });
-            
-            closeContact.addEventListener('click', () => {
-                contactModal.style.display = 'none';
-            });
-            
-            contactModal.addEventListener('click', (e) => {
-                if (e.target === contactModal) {
-                    contactModal.style.display = 'none';
-                }
-            });
-            
-            // Close modals with Escape key
-            document.addEventListener('keydown', (e) => {
-                if (e.key === 'Escape') {
-                    announcementModal.style.display = 'none';
-                    privacyModal.style.display = 'none';
-                    termsModal.style.display = 'none';
-                    contactModal.style.display = 'none';
-                }
-            });
-        }
-
-        // Student data and rendering functions
+        // Student data and rendering functions (from original code)
         const students = [
             { id: 1, name: "Akhi Aktar Mim", 
 studentId: "250101"
