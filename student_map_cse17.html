@@ -1,0 +1,1276 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0, user-scalable=no" />
+  <title>PUST CSE 17th Batch Student Map</title>
+
+  <link rel="stylesheet" href="https://unpkg.com/leaflet@1.9.4/dist/leaflet.css" />
+  <script src="https://unpkg.com/leaflet@1.9.4/dist/leaflet.js"></script>
+
+  <style>
+    * { margin: 0; padding: 0; box-sizing: border-box; }
+    body {
+      font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+      background: #eef2f5;
+      height: 100vh;
+      overflow: hidden;
+      color: #123524;
+    }
+    .header {
+      height: 72px;
+      background: linear-gradient(135deg, #0f3e28, #1e5a3c);
+      color: #fff;
+      padding: 10px 18px;
+      text-align: center;
+      box-shadow: 0 4px 12px rgba(0,0,0,.16);
+      position: relative;
+      z-index: 10;
+    }
+    .header h1 { font-size: clamp(1.1rem, 2.5vw, 1.55rem); letter-spacing: .4px; }
+    .header p { font-size: .84rem; opacity: .9; margin-top: 3px; }
+    .main-container { display: flex; height: calc(100vh - 94px); overflow: hidden; }
+    .map-container { flex: 1; min-width: 0; position: relative; }
+    #bangladesh-map { height: 100%; width: 100%; background: #86aaa1; }
+    .leaflet-tile-pane { filter: brightness(0.78) saturate(1.25) contrast(1.12); }
+    .sidebar {
+      width: 360px;
+      background: #fff;
+      border-left: 1px solid #d9e2df;
+      box-shadow: -4px 0 18px rgba(0,0,0,.08);
+      overflow-y: auto;
+      padding: 16px;
+      z-index: 20;
+    }
+    .sidebar h2 { color: #1e5a3c; font-size: 1.05rem; margin-bottom: 10px; }
+    .stats {
+      display: grid;
+      grid-template-columns: repeat(2, 1fr);
+      gap: 10px;
+      margin: 12px 0 14px;
+    }
+    .stat-box {
+      background: #f6faf8;
+      border: 1px solid #e2eee8;
+      border-radius: 16px;
+      padding: 10px;
+      text-align: center;
+    }
+    .stat-box strong { display: block; color: #0f3e28; font-size: 1.25rem; }
+    .stat-box span { font-size: .72rem; color: #5d7168; }
+    #searchBox {
+      width: 100%; padding: 11px 14px; border: 1px solid #cbd8d2; border-radius: 26px;
+      outline: none; margin-bottom: 12px; font-size: .9rem;
+    }
+    #searchBox:focus { border-color: #1e5a3c; box-shadow: 0 0 0 3px rgba(30,90,60,.13); }
+    .student-list { display: flex; flex-direction: column; gap: 10px; }
+    .student-row {
+      display: flex; gap: 10px; align-items: center; background: #fbfdfc; border: 1px solid #e5eee9;
+      border-radius: 16px; padding: 9px; cursor: pointer; transition: .2s;
+    }
+    .student-row:hover { transform: translateY(-2px); box-shadow: 0 8px 18px rgba(0,0,0,.08); border-color: #ffc107; }
+    .student-row img, .initials-small {
+      width: 48px; height: 48px; border-radius: 50%; object-fit: cover; flex: 0 0 auto;
+      border: 2px solid #ffc107; background: linear-gradient(135deg, #1e5a3c, #ffc107);
+    }
+    .initials-small { display: flex; align-items: center; justify-content: center; color: #fff; font-weight: 800; }
+    .row-name { font-weight: 800; font-size: .84rem; color: #173e2c; line-height: 1.2; }
+    .row-meta { font-size: .74rem; color: #777; margin-top: 2px; }
+
+    .leaflet-div-icon { background: transparent; border: none; }
+    .student-marker-card {
+      width: 38px;
+      height: 38px;
+      background: transparent;
+      border: none;
+      border-radius: 50%;
+      padding: 0;
+      text-align: center;
+      box-shadow: 0 5px 14px rgba(0,0,0,.30);
+      cursor: pointer;
+      transition: transform .18s, box-shadow .18s;
+    }
+    .student-marker-card:hover { transform: scale(1.18); box-shadow: 0 8px 18px rgba(0,0,0,.36); }
+    .marker-photo, .marker-initials {
+      width: 38px; height: 38px; border-radius: 50%; object-fit: cover; border: 2px solid #ffc107;
+      background: white; margin: 0; box-shadow: 0 2px 8px rgba(0,0,0,.18);
+    }
+    .marker-initials { display: flex; align-items: center; justify-content: center; color: #fff; font-weight: 900; font-size: .68rem; background: linear-gradient(135deg,#1e5a3c,#3b82f6); }
+    .marker-name, .marker-district { display: none; }
+    .popup-card { text-align:center; min-width: 180px; }
+    .popup-card img, .popup-initials { width: 82px; height: 82px; border-radius: 50%; object-fit: cover; border: 3px solid #ffc107; margin-bottom: 7px; }
+    .popup-initials { display:inline-flex; align-items:center; justify-content:center; color:#fff; font-weight:900; background:linear-gradient(135deg,#1e5a3c,#3b82f6); }
+    .popup-name { font-weight: 900; color: #173e2c; }
+    .popup-meta { font-size: .78rem; color: #667; margin-top: 3px; }
+    footer { height: 22px; font-size: 11px; text-align: center; background: #e2e6e9; padding: 3px; color: #345; }
+
+    @media (max-width: 880px) {
+      body { overflow: auto; }
+      .main-container { flex-direction: column; height: auto; }
+      .map-container { height: 68vh; min-height: 470px; }
+      .sidebar { width: 100%; max-height: none; border-left: none; border-top: 1px solid #d9e2df; }
+      .header { height: auto; }
+    }
+
+
+    /* === Enhanced Bangladesh district border + readable district labels === */
+    .map-guide {
+      position: absolute;
+      top: 14px;
+      left: 14px;
+      z-index: 900;
+      background: rgba(255,255,255,.95);
+      border: 1px solid rgba(15,62,40,.18);
+      border-left: 5px solid #ffc107;
+      border-radius: 14px;
+      padding: 10px 12px;
+      color: #173e2c;
+      box-shadow: 0 8px 22px rgba(0,0,0,.15);
+      font-size: .78rem;
+      line-height: 1.35;
+      max-width: 310px;
+      backdrop-filter: blur(3px);
+    }
+    .map-guide b { color: #0f3e28; }
+    .home-district-label {
+      background: #fff2b8;
+      color: #06351f;
+      border: 1px solid #0f3e28;
+      border-radius: 999px;
+      padding: 2px 5px;
+      font-size: 8px;
+      font-weight: 900;
+      letter-spacing: .1px;
+      white-space: nowrap;
+      box-shadow: 0 2px 0 #ffc107, 0 5px 12px rgba(0,0,0,.22);
+      text-shadow: 0 1px 0 rgba(255,255,255,.75);
+    }
+    .home-district-label .count {
+      display: inline-flex;
+      align-items: center;
+      justify-content: center;
+      min-width: 14px;
+      height: 14px;
+      margin-left: 3px;
+      padding: 0 4px;
+      border-radius: 999px;
+      background: #0f3e28;
+      color: #fff;
+      font-size: 7px;
+      box-shadow: inset 0 0 0 1px rgba(255,255,255,.25);
+    }
+    .district-label-wrapper { background: transparent; border: none; }
+    .district-name-tooltip {
+      background: rgba(15,62,40,.94);
+      color: #fff;
+      border: 1px solid rgba(255,193,7,.8);
+      border-radius: 999px;
+      box-shadow: 0 5px 14px rgba(0,0,0,.22);
+      font-weight: 800;
+      padding: 3px 9px;
+    }
+    .district-name-tooltip::before { display: none; }
+    .leaflet-control-layers, .leaflet-control-zoom {
+      border-radius: 12px !important;
+      overflow: hidden;
+      box-shadow: 0 6px 16px rgba(0,0,0,.16) !important;
+    }
+    @media (max-width: 880px) {
+      .map-guide { max-width: calc(100% - 28px); font-size: .72rem; }
+      .home-district-label { font-size: 7px; padding: 2px 4px; }
+    }
+
+    /* === Fix: district name + student photo both visible === */
+    .district-label-wrapper { pointer-events: none; }
+    .home-district-label {
+      transform: translate(22px, -24px);
+      position: relative;
+      z-index: 1;
+      max-width: 95px;
+      overflow: hidden;
+      text-overflow: ellipsis;
+    }
+    .student-marker-card { position: relative; z-index: 3; }
+    .student-marker-card.selected {
+      transform: scale(1.28);
+      box-shadow: 0 0 0 5px rgba(255,193,7,.35), 0 12px 24px rgba(0,0,0,.42);
+    }
+    .leaflet-popup { z-index: 1200; }
+    .leaflet-popup-content-wrapper {
+      border-radius: 18px;
+      box-shadow: 0 14px 35px rgba(0,0,0,.32);
+    }
+    .leaflet-popup-tip { box-shadow: 0 8px 18px rgba(0,0,0,.22); }
+    .student-detail-panel {
+      position: absolute;
+      right: 14px;
+      bottom: 14px;
+      width: min(340px, calc(100% - 28px));
+      z-index: 1300;
+      background: rgba(255,255,255,.98);
+      color: #173e2c;
+      border: 1px solid rgba(15,62,40,.14);
+      border-top: 5px solid #ffc107;
+      border-radius: 20px;
+      box-shadow: 0 18px 45px rgba(0,0,0,.28);
+      padding: 14px;
+      display: none;
+      backdrop-filter: blur(4px);
+    }
+    .student-detail-panel.show { display: block; }
+    .detail-close {
+      position: absolute;
+      top: 8px;
+      right: 10px;
+      width: 30px;
+      height: 30px;
+      border: 0;
+      border-radius: 50%;
+      background: #eef4f1;
+      color: #123524;
+      font-weight: 900;
+      cursor: pointer;
+    }
+    .detail-body { display: flex; gap: 12px; align-items: center; padding-right: 26px; }
+    .detail-body img, .detail-initials {
+      width: 86px;
+      height: 86px;
+      border-radius: 50%;
+      object-fit: cover;
+      border: 3px solid #ffc107;
+      flex: 0 0 auto;
+    }
+    .detail-initials {
+      display:flex; align-items:center; justify-content:center;
+      color:#fff; font-weight:900; font-size: 1.2rem;
+      background:linear-gradient(135deg,#1e5a3c,#3b82f6);
+    }
+    .detail-name { font-weight: 900; font-size: 1rem; line-height: 1.2; margin-bottom: 5px; }
+    .detail-line { font-size: .82rem; color: #586960; margin-top: 3px; }
+    .detail-line b { color: #173e2c; }
+    @media (max-width: 880px) {
+      .home-district-label { transform: translate(18px, -22px); max-width: 85px; }
+      .student-detail-panel { left: 14px; right: 14px; bottom: 12px; width: auto; }
+    }
+
+
+
+    /* === Click-info fix: only the clicked student's info/photo is shown clearly === */
+    .leaflet-popup-pane { z-index: 1600 !important; }
+    .leaflet-tooltip-pane { z-index: 1500 !important; }
+    .student-popup-only .leaflet-popup-content { margin: 12px 14px; }
+    .student-popup-only .leaflet-popup-content-wrapper {
+      background: #ffffff;
+      border: 1px solid rgba(15,62,40,.18);
+      border-top: 5px solid #ffc107;
+      overflow: hidden;
+    }
+    .popup-card { width: 230px; max-width: 78vw; overflow: hidden; }
+    .popup-card img, .popup-initials { display: block; margin: 0 auto 8px; }
+    .popup-meta { overflow-wrap: anywhere; line-height: 1.35; }
+    .student-detail-panel {
+      max-height: min(360px, calc(100% - 28px));
+      overflow-y: auto;
+    }
+    .detail-body { align-items: flex-start; }
+    .detail-body > div:last-child { min-width: 0; }
+    .detail-name, .detail-line { overflow-wrap: anywhere; }
+    .detail-hint {
+      margin-top: 9px;
+      padding-top: 8px;
+      border-top: 1px solid #edf2ef;
+      font-size: .72rem;
+      color: #6a7b73;
+    }
+
+  
+/* === CSE_17 website inspired theme: purple-blue gradient, white glass cards === */
+:root {
+  --theme-primary: #667eea;
+  --theme-secondary: #764ba2;
+  --theme-text: #333333;
+  --theme-muted: #666666;
+  --theme-soft: rgba(255,255,255,0.25);
+  --theme-border: rgba(102,126,234,0.25);
+  --theme-shadow: 0 5px 20px rgba(0,0,0,0.15);
+}
+body {
+  background: linear-gradient(135deg, var(--theme-primary) 0%, var(--theme-secondary) 100%);
+  color: var(--theme-text);
+  position: relative;
+  overflow: hidden;
+}
+.bg-shape {
+  position: fixed;
+  border-radius: 50%;
+  opacity: 0.10;
+  animation: float 20s infinite;
+  z-index: 0;
+  background: #ffffff;
+  pointer-events: none;
+}
+.shape1 { width: 300px; height: 300px; top: -100px; left: -100px; animation-delay: 0s; }
+.shape2 { width: 200px; height: 200px; bottom: -50px; right: -50px; animation-delay: 5s; }
+.shape3 { width: 150px; height: 150px; top: 50%; right: 10%; animation-delay: 10s; }
+@keyframes float {
+  0%, 100% { transform: translate(0, 0) rotate(0deg); }
+  25% { transform: translate(30px, -30px) rotate(90deg); }
+  50% { transform: translate(-30px, 30px) rotate(180deg); }
+  75% { transform: translate(30px, 30px) rotate(270deg); }
+}
+.header {
+  background: #ffffff !important;
+  color: var(--theme-primary) !important;
+  box-shadow: var(--theme-shadow) !important;
+}
+.header h1 { color: var(--theme-primary); text-shadow: none; }
+.main-container { position: relative; z-index: 1; }
+.map-container {
+  margin: 14px 0 14px 14px;
+  overflow: hidden;
+  border-radius: 22px;
+  box-shadow: 0 12px 35px rgba(0,0,0,0.22);
+  border: 1px solid rgba(255,255,255,0.38);
+}
+#bangladesh-map { background: rgba(255,255,255,0.18) !important; }
+.leaflet-tile-pane { filter: brightness(0.92) saturate(1.12) contrast(1.03); }
+.sidebar {
+  margin: 14px 14px 14px 0;
+  border-left: 0 !important;
+  border-radius: 0 22px 22px 0;
+  background: rgba(255,255,255,0.94) !important;
+  box-shadow: 0 12px 35px rgba(0,0,0,0.18) !important;
+}
+.sidebar h2, .stat-box strong, .popup-name, .detail-name, .detail-line b, .map-guide b { color: var(--theme-primary) !important; }
+.stat-box {
+  background: #f8f7ff !important;
+  border-color: rgba(102,126,234,0.18) !important;
+}
+#searchBox { border-color: rgba(102,126,234,0.30) !important; }
+#searchBox:focus { border-color: var(--theme-primary) !important; box-shadow: 0 0 0 3px rgba(102,126,234,.16) !important; }
+.student-row { border-color: rgba(102,126,234,0.16) !important; }
+.student-row:hover { border-color: var(--theme-primary) !important; box-shadow: 0 8px 18px rgba(102,126,234,.18) !important; }
+.student-row img, .initials-small, .marker-photo, .marker-initials, .popup-card img, .popup-initials {
+  border-color: var(--theme-primary) !important;
+}
+.initials-small, .marker-initials, .popup-initials {
+  background: linear-gradient(135deg, var(--theme-primary), var(--theme-secondary)) !important;
+}
+.student-marker-card.selected {
+  box-shadow: 0 0 0 5px rgba(102,126,234,.32), 0 12px 24px rgba(0,0,0,.38) !important;
+}
+.map-guide {
+  border-left-color: var(--theme-primary) !important;
+  color: var(--theme-text) !important;
+  background: rgba(255,255,255,.92) !important;
+}
+.home-district-label {
+  background: #f1edff !important;
+  color: var(--theme-primary) !important;
+  border-color: var(--theme-primary) !important;
+  box-shadow: 0 2px 0 rgba(102,126,234,.35), 0 5px 12px rgba(0,0,0,.18) !important;
+}
+.home-district-label .count { background: var(--theme-primary) !important; }
+.district-name-tooltip {
+  background: rgba(102,126,234,.95) !important;
+  border-color: rgba(255,255,255,.75) !important;
+}
+.student-popup-only .leaflet-popup-content-wrapper {
+  border-color: rgba(102,126,234,.18) !important;
+  border-top-color: var(--theme-primary) !important;
+}
+footer {
+  position: relative;
+  z-index: 1;
+  background: rgba(255,255,255,0.86) !important;
+  color: var(--theme-primary) !important;
+  font-weight: 700;
+}
+/* Bottom notification/detail panel intentionally disabled */
+.student-detail-panel { display: none !important; }
+@media (max-width: 880px) {
+  body { overflow: auto; }
+  .map-container { margin: 10px; border-radius: 20px; }
+  .sidebar { margin: 0 10px 10px; border-radius: 20px; }
+}
+
+  
+
+/* === Dark mode outside map only ===
+   Map tiles and map canvas are intentionally left unchanged. */
+:root {
+  --dark-bg-1: #0f1020;
+  --dark-bg-2: #1a1635;
+  --dark-card: rgba(20, 22, 38, 0.94);
+  --dark-card-2: rgba(28, 31, 49, 0.96);
+  --dark-border: rgba(255, 255, 255, 0.12);
+  --dark-text: #f5f7ff;
+  --dark-muted: #b9bfd6;
+  --dark-primary: #8ea2ff;
+  --dark-secondary: #b084f7;
+  --dark-accent: #a78bfa;
+}
+body {
+  background: linear-gradient(135deg, var(--dark-bg-1) 0%, var(--dark-bg-2) 100%) !important;
+  color: var(--dark-text) !important;
+}
+.bg-shape { opacity: 0.055 !important; }
+.header {
+  background: rgba(15, 16, 32, 0.96) !important;
+  color: var(--dark-text) !important;
+  border-bottom: 1px solid var(--dark-border) !important;
+}
+.header h1 {
+  color: var(--dark-text) !important;
+  text-shadow: 0 2px 18px rgba(142, 162, 255, 0.25) !important;
+}
+.sidebar {
+  background: var(--dark-card) !important;
+  color: var(--dark-text) !important;
+  border: 1px solid var(--dark-border) !important;
+  backdrop-filter: blur(10px) !important;
+}
+.sidebar h2,
+.stat-box strong,
+.row-name,
+.popup-name,
+.map-guide b {
+  color: var(--dark-primary) !important;
+}
+.stat-box {
+  background: var(--dark-card-2) !important;
+  border-color: var(--dark-border) !important;
+}
+.stat-box span,
+.row-meta,
+.popup-meta,
+.map-guide,
+footer {
+  color: var(--dark-muted) !important;
+}
+#searchBox {
+  background: rgba(10, 12, 24, 0.95) !important;
+  color: var(--dark-text) !important;
+  border-color: var(--dark-border) !important;
+}
+#searchBox::placeholder { color: rgba(245, 247, 255, 0.55) !important; }
+#searchBox:focus {
+  border-color: var(--dark-primary) !important;
+  box-shadow: 0 0 0 3px rgba(142, 162, 255, 0.18) !important;
+}
+.student-row {
+  background: rgba(24, 27, 43, 0.96) !important;
+  border-color: var(--dark-border) !important;
+  color: var(--dark-text) !important;
+}
+.student-row:hover {
+  border-color: var(--dark-primary) !important;
+  box-shadow: 0 8px 20px rgba(142, 162, 255, 0.18) !important;
+}
+.student-row img,
+.initials-small,
+.marker-photo,
+.marker-initials,
+.popup-card img,
+.popup-initials {
+  border-color: var(--dark-primary) !important;
+}
+.initials-small,
+.marker-initials,
+.popup-initials {
+  background: linear-gradient(135deg, var(--dark-primary), var(--dark-secondary)) !important;
+}
+.map-guide {
+  background: rgba(15, 16, 32, 0.88) !important;
+  border-color: var(--dark-border) !important;
+  border-left-color: var(--dark-primary) !important;
+  box-shadow: 0 10px 28px rgba(0,0,0,0.30) !important;
+}
+.home-district-label {
+  background: rgba(20, 22, 38, 0.92) !important;
+  color: var(--dark-text) !important;
+  border-color: var(--dark-primary) !important;
+  box-shadow: 0 2px 0 rgba(142,162,255,.35), 0 5px 12px rgba(0,0,0,.28) !important;
+}
+.home-district-label .count { background: var(--dark-primary) !important; color: #0f1020 !important; }
+.district-name-tooltip {
+  background: rgba(15, 16, 32, 0.96) !important;
+  color: var(--dark-text) !important;
+  border-color: rgba(142, 162, 255, 0.72) !important;
+}
+.leaflet-popup-content-wrapper {
+  background: rgba(18, 20, 34, 0.98) !important;
+  color: var(--dark-text) !important;
+  border: 1px solid var(--dark-border) !important;
+  border-top: 5px solid var(--dark-primary) !important;
+}
+.leaflet-popup-tip { background: rgba(18, 20, 34, 0.98) !important; }
+.leaflet-container a.leaflet-popup-close-button { color: var(--dark-text) !important; }
+.leaflet-control-zoom a,
+.leaflet-control-layers {
+  background: rgba(18, 20, 34, 0.95) !important;
+  color: var(--dark-text) !important;
+  border-color: var(--dark-border) !important;
+}
+.leaflet-control-zoom a:hover { background: rgba(36, 40, 62, 0.98) !important; }
+footer {
+  background: rgba(15, 16, 32, 0.94) !important;
+  border-top: 1px solid var(--dark-border) !important;
+}
+/* Keep map unchanged */
+#bangladesh-map { background: rgba(255,255,255,0.18) !important; }
+.leaflet-tile-pane { filter: none !important; }
+
+  </style>
+</head>
+<body>
+  <div class="bg-shape shape1"></div>
+  <div class="bg-shape shape2"></div>
+  <div class="bg-shape shape3"></div>
+  <div class="header">
+    <h1> PUST CSE 17th Batch — Student's District Map</h1>
+  </div>
+
+  <div class="main-container">
+    <div class="map-container">
+      <div id="bangladesh-map"></div>
+      <div class="map-guide">
+      </div>
+    </div>
+    <aside class="sidebar">
+      <h2>🎓 Student List</h2>
+      <div class="stats">
+        <div class="stat-box"><strong id="totalStudents">0</strong><span>Total Students</span></div>
+        <div class="stat-box"><strong id="totalDistricts">0</strong><span>Districts Found</span></div>
+      </div>
+      <input id="searchBox" type="text" placeholder="Search name, ID or district..." />
+      <div class="student-list" id="studentList"></div>
+    </aside>
+  </div>
+  <footer>Bangladesh map with collected PUST CSE-17 student's information</footer>
+  <script>
+    // Student/location information is stored below as ASCII character codes.
+// This hides readable source-view data; it is not cryptographic security.
+function decodeAsciiJson(codes) {
+  return JSON.parse(String.fromCharCode.apply(null, codes));
+}
+const studentsData = decodeAsciiJson([
+    91,123,34,110,97,109,101,34,58,34,65,107,104,105,32,65,107,116,97,114,32,77,105,109,34,44,34,115,
+    116,117,100,101,110,116,73,100,34,58,34,50,53,48,49,48,49,34,44,34,100,105,115,116,114,105,99,116,
+    34,58,34,80,97,98,110,97,34,44,34,112,101,114,109,97,110,101,110,116,65,100,100,114,101,115,115,34,
+    58,34,77,117,106,97,104,105,100,32,67,108,117,98,44,32,80,97,98,110,97,34,44,34,112,104,111,116,
+    111,85,114,108,34,58,34,104,116,116,112,115,58,47,47,105,46,105,98,98,46,99,111,46,99,111,109,47,
+    118,52,51,66,122,121,110,80,47,73,77,71,45,51,53,52,56,46,106,112,103,34,125,44,123,34,110,97,
+    109,101,34,58,34,77,100,46,32,78,97,115,105,114,32,85,100,100,105,110,32,78,97,102,105,122,34,44,
+    34,115,116,117,100,101,110,116,73,100,34,58,34,50,53,48,49,48,51,34,44,34,100,105,115,116,114,105,
+    99,116,34,58,34,66,111,103,117,114,97,34,44,34,112,101,114,109,97,110,101,110,116,65,100,100,114,101,
+    115,115,34,58,34,83,104,97,114,105,97,107,97,110,100,105,44,32,66,111,103,117,114,97,34,44,34,112,
+    104,111,116,111,85,114,108,34,58,34,104,116,116,112,115,58,47,47,105,46,105,98,98,46,99,111,46,99,
+    111,109,47,89,70,103,70,116,51,66,100,47,97,116,116,45,56,99,52,118,52,118,101,120,57,55,103,99,
+    48,45,84,88,73,103,45,75,75,85,99,45,85,55,45,89,84,97,45,107,45,77,78,45,75,106,45,66,
+    50,55,45,79,97,45,70,114,45,70,107,46,106,112,103,34,125,44,123,34,110,97,109,101,34,58,34,65,
+    109,105,116,32,75,117,109,97,114,32,68,104,97,108,105,34,44,34,115,116,117,100,101,110,116,73,100,34,
+    58,34,50,53,48,49,48,52,34,44,34,100,105,115,116,114,105,99,116,34,58,34,75,104,117,108,110,97,
+    34,44,34,112,101,114,109,97,110,101,110,116,65,100,100,114,101,115,115,34,58,34,80,97,105,107,103,97,
+    99,104,97,44,32,75,104,117,108,110,97,34,44,34,112,104,111,116,111,85,114,108,34,58,34,104,116,116,
+    112,115,58,47,47,105,46,105,98,98,46,99,111,46,99,111,109,47,66,53,103,86,53,86,88,86,47,73,
+    77,71,45,54,48,50,52,46,106,112,103,34,125,44,123,34,110,97,109,101,34,58,34,77,100,46,32,83,
+    104,97,102,97,121,97,116,32,65,104,109,101,100,34,44,34,115,116,117,100,101,110,116,73,100,34,58,34,
+    50,53,48,49,48,53,34,44,34,100,105,115,116,114,105,99,116,34,58,34,78,97,111,103,97,111,110,34,
+    44,34,112,101,114,109,97,110,101,110,116,65,100,100,114,101,115,115,34,58,34,78,105,97,109,97,116,112,
+    117,114,44,32,78,97,111,103,97,111,110,34,44,34,112,104,111,116,111,85,114,108,34,58,34,104,116,116,
+    112,115,58,47,47,105,46,105,98,98,46,99,111,46,99,111,109,47,74,82,100,68,74,118,68,90,47,73,
+    77,71,45,51,53,56,51,46,106,112,103,34,125,44,123,34,110,97,109,101,34,58,34,84,111,117,102,105,
+    113,117,101,32,65,108,32,73,109,114,97,110,34,44,34,115,116,117,100,101,110,116,73,100,34,58,34,50,
+    53,48,49,48,54,34,44,34,100,105,115,116,114,105,99,116,34,58,34,78,97,111,103,97,111,110,34,44,
+    34,112,101,114,109,97,110,101,110,116,65,100,100,114,101,115,115,34,58,34,77,111,104,97,100,101,118,112,
+    117,114,44,32,78,97,111,103,97,111,110,34,44,34,112,104,111,116,111,85,114,108,34,58,34,104,116,116,
+    112,115,58,47,47,105,46,105,98,98,46,99,111,46,99,111,109,47,57,107,49,87,78,98,102,103,47,73,
+    77,71,45,51,53,53,54,46,106,112,103,34,125,44,123,34,110,97,109,101,34,58,34,65,112,117,114,98,
+    97,32,75,117,109,97,114,34,44,34,115,116,117,100,101,110,116,73,100,34,58,34,50,53,48,49,48,55,
+    34,44,34,100,105,115,116,114,105,99,116,34,58,34,78,97,111,103,97,111,110,34,44,34,112,101,114,109,
+    97,110,101,110,116,65,100,100,114,101,115,115,34,58,34,82,97,110,105,110,97,103,97,114,44,32,78,97,
+    111,103,97,111,110,34,44,34,112,104,111,116,111,85,114,108,34,58,34,104,116,116,112,115,58,47,47,105,
+    46,105,98,98,46,99,111,46,99,111,109,47,53,104,84,103,57,56,48,71,47,97,57,55,53,97,55,53,
+    101,45,100,52,54,55,45,52,98,57,51,45,98,102,100,49,45,51,97,98,52,51,98,98,48,100,97,100,
+    53,46,106,112,103,34,125,44,123,34,110,97,109,101,34,58,34,77,68,46,32,77,85,72,73,66,85,82,
+    32,82,65,72,77,65,78,32,66,72,85,73,89,65,78,34,44,34,115,116,117,100,101,110,116,73,100,34,
+    58,34,50,53,48,49,48,56,34,44,34,100,105,115,116,114,105,99,116,34,58,34,68,104,97,107,97,34,
+    44,34,112,101,114,109,97,110,101,110,116,65,100,100,114,101,115,115,34,58,34,68,104,97,107,97,34,44,
+    34,112,104,111,116,111,85,114,108,34,58,34,104,116,116,112,115,58,47,47,105,46,105,98,98,46,99,111,
+    46,99,111,109,47,57,51,52,76,106,112,98,67,47,73,77,71,45,51,53,54,56,46,106,112,103,34,125,
+    44,123,34,110,97,109,101,34,58,34,77,100,46,32,70,97,114,117,107,32,72,111,115,115,97,105,110,34,
+    44,34,115,116,117,100,101,110,116,73,100,34,58,34,50,53,48,49,48,57,34,44,34,100,105,115,116,114,
+    105,99,116,34,58,34,68,105,110,97,106,112,117,114,34,44,34,112,101,114,109,97,110,101,110,116,65,100,
+    100,114,101,115,115,34,58,34,66,105,114,97,109,112,117,114,44,32,68,105,110,97,106,112,117,114,34,44,
+    34,112,104,111,116,111,85,114,108,34,58,34,104,116,116,112,115,58,47,47,105,46,105,98,98,46,99,111,
+    46,99,111,109,47,76,122,70,86,115,71,119,121,47,97,116,116,45,84,81,113,45,86,76,45,110,117,45,
+    67,120,98,45,71,57,45,87,65,113,45,69,84,81,45,76,100,50,117,120,114,50,45,68,57,121,118,45,
+    72,112,45,75,81,45,89,104,45,86,72,114,56,103,46,106,112,103,34,125,44,123,34,110,97,109,101,34,
+    58,34,85,112,97,109,97,32,83,97,104,97,34,44,34,115,116,117,100,101,110,116,73,100,34,58,34,50,
+    53,48,49,49,48,34,44,34,100,105,115,116,114,105,99,116,34,58,34,84,97,110,103,97,105,108,34,44,
+    34,112,101,114,109,97,110,101,110,116,65,100,100,114,101,115,115,34,58,34,84,97,110,103,97,105,108,34,
+    44,34,112,104,111,116,111,85,114,108,34,58,34,104,116,116,112,115,58,47,47,105,46,105,98,98,46,99,
+    111,46,99,111,109,47,106,90,103,75,90,100,55,54,47,97,116,116,45,102,45,90,68,104,45,78,98,45,
+    52,45,82,68,122,49,45,70,53,45,75,66,118,52,51,122,108,49,48,56,98,109,45,65,66,110,45,107,
+    45,75,82,110,103,45,87,45,116,117,45,89,67,68,99,46,106,112,103,34,125,44,123,34,110,97,109,101,
+    34,58,34,77,100,46,32,77,97,104,102,105,108,32,65,107,116,101,114,34,44,34,115,116,117,100,101,110,
+    116,73,100,34,58,34,50,53,48,49,49,49,34,44,34,100,105,115,116,114,105,99,116,34,58,34,78,97,
+    111,103,97,111,110,34,44,34,112,101,114,109,97,110,101,110,116,65,100,100,114,101,115,115,34,58,34,78,
+    97,111,103,97,111,110,34,44,34,112,104,111,116,111,85,114,108,34,58,34,104,116,116,112,115,58,47,47,
+    105,46,105,98,98,46,99,111,46,99,111,109,47,51,109,70,78,112,116,70,51,47,73,77,71,45,51,53,
+    52,48,46,106,112,103,34,125,44,123,34,110,97,109,101,34,58,34,77,100,46,32,65,115,97,100,117,108,
+    108,97,104,32,65,116,105,107,34,44,34,115,116,117,100,101,110,116,73,100,34,58,34,50,53,48,49,49,
+    50,34,44,34,100,105,115,116,114,105,99,116,34,58,34,68,105,110,97,106,112,117,114,34,44,34,112,101,
+    114,109,97,110,101,110,116,65,100,100,114,101,115,115,34,58,34,68,105,110,97,106,112,117,114,34,44,34,
+    112,104,111,116,111,85,114,108,34,58,34,104,116,116,112,115,58,47,47,105,46,105,98,98,46,99,111,46,
+    99,111,109,47,122,84,100,54,107,54,90,106,47,73,77,71,45,51,53,54,51,46,106,112,103,34,125,44,
+    123,34,110,97,109,101,34,58,34,65,118,105,106,105,116,32,66,105,115,119,97,115,34,44,34,115,116,117,
+    100,101,110,116,73,100,34,58,34,50,53,48,49,49,51,34,44,34,100,105,115,116,114,105,99,116,34,58,
+    34,74,97,115,104,111,114,101,34,44,34,112,101,114,109,97,110,101,110,116,65,100,100,114,101,115,115,34,
+    58,34,74,97,115,104,111,114,101,34,44,34,112,104,111,116,111,85,114,108,34,58,34,104,116,116,112,115,
+    58,47,47,105,46,105,98,98,46,99,111,46,99,111,109,47,121,99,102,53,70,116,68,51,47,97,57,50,
+    99,49,101,52,54,45,99,50,55,48,45,52,55,98,50,45,56,50,101,55,45,52,99,57,98,52,101,56,
+    49,98,51,55,48,46,106,112,103,34,125,44,123,34,110,97,109,101,34,58,34,77,115,116,46,32,83,117,
+    109,97,105,121,97,32,73,115,108,97,109,34,44,34,115,116,117,100,101,110,116,73,100,34,58,34,50,53,
+    48,49,49,52,34,44,34,100,105,115,116,114,105,99,116,34,58,34,71,97,122,105,112,117,114,34,44,34,
+    112,101,114,109,97,110,101,110,116,65,100,100,114,101,115,115,34,58,34,71,97,122,105,112,117,114,32,83,
+    97,100,97,114,44,32,71,97,122,105,112,117,114,34,44,34,112,104,111,116,111,85,114,108,34,58,34,104,
+    116,116,112,115,58,47,47,105,46,105,98,98,46,99,111,46,99,111,109,47,109,114,109,112,112,49,100,70,
+    47,73,77,71,45,51,53,54,49,46,106,112,103,34,125,44,123,34,110,97,109,101,34,58,34,82,105,109,
+    97,32,74,97,104,97,110,34,44,34,115,116,117,100,101,110,116,73,100,34,58,34,50,53,48,49,49,53,
+    34,44,34,100,105,115,116,114,105,99,116,34,58,34,84,104,97,107,117,114,103,97,111,110,34,44,34,112,
+    101,114,109,97,110,101,110,116,65,100,100,114,101,115,115,34,58,34,84,104,97,107,117,114,103,97,111,110,
+    34,44,34,112,104,111,116,111,85,114,108,34,58,34,34,125,44,123,34,110,97,109,101,34,58,34,77,83,
+    84,46,32,85,82,77,73,76,65,32,75,72,65,84,85,78,34,44,34,115,116,117,100,101,110,116,73,100,
+    34,58,34,50,53,48,49,49,54,34,44,34,100,105,115,116,114,105,99,116,34,58,34,78,97,116,111,114,
+    101,34,44,34,112,101,114,109,97,110,101,110,116,65,100,100,114,101,115,115,34,58,34,78,97,108,100,97,
+    110,103,97,44,32,78,97,116,111,114,101,34,44,34,112,104,111,116,111,85,114,108,34,58,34,104,116,116,
+    112,115,58,47,47,105,46,105,98,98,46,99,111,46,99,111,109,47,55,116,52,71,102,72,118,87,47,49,
+    53,53,102,102,50,48,50,45,102,49,49,57,45,52,51,98,102,45,57,54,102,50,45,101,56,100,52,98,
+    52,55,100,97,99,55,97,46,106,112,103,34,125,44,123,34,110,97,109,101,34,58,34,77,68,46,32,70,
+    111,114,104,97,100,32,90,97,109,97,110,34,44,34,115,116,117,100,101,110,116,73,100,34,58,34,50,53,
+    48,49,49,55,34,44,34,100,105,115,116,114,105,99,116,34,58,34,82,97,106,115,104,97,104,105,34,44,
+    34,112,101,114,109,97,110,101,110,116,65,100,100,114,101,115,115,34,58,34,71,111,100,97,103,97,114,105,
+    44,32,82,97,106,115,104,97,104,105,34,44,34,112,104,111,116,111,85,114,108,34,58,34,104,116,116,112,
+    115,58,47,47,105,46,105,98,98,46,99,111,46,99,111,109,47,112,118,103,55,114,120,86,74,47,73,77,
+    71,45,51,53,55,56,46,106,112,103,34,125,44,123,34,110,97,109,101,34,58,34,77,68,46,32,83,79,
+    89,65,66,32,72,79,83,83,65,73,78,34,44,34,115,116,117,100,101,110,116,73,100,34,58,34,50,53,
+    48,49,49,57,34,44,34,100,105,115,116,114,105,99,116,34,58,34,83,105,114,97,106,103,97,110,106,34,
+    44,34,112,101,114,109,97,110,101,110,116,65,100,100,114,101,115,115,34,58,34,83,105,114,97,106,103,97,
+    110,106,34,44,34,112,104,111,116,111,85,114,108,34,58,34,104,116,116,112,115,58,47,47,105,46,105,98,
+    98,46,99,111,46,99,111,109,47,75,106,114,74,48,122,55,70,47,73,77,71,45,51,53,57,53,46,106,
+    112,103,34,125,44,123,34,110,97,109,101,34,58,34,65,115,109,97,117,108,32,72,117,115,110,97,34,44,
+    34,115,116,117,100,101,110,116,73,100,34,58,34,50,53,48,49,50,48,34,44,34,100,105,115,116,114,105,
+    99,116,34,58,34,84,97,110,103,97,105,108,34,44,34,112,101,114,109,97,110,101,110,116,65,100,100,114,
+    101,115,115,34,58,34,84,97,110,103,97,105,108,34,44,34,112,104,111,116,111,85,114,108,34,58,34,104,
+    116,116,112,115,58,47,47,105,46,105,98,98,46,99,111,46,99,111,109,47,75,122,56,77,72,114,87,114,
+    47,97,116,116,45,48,104,112,45,80,82,55,122,52,45,87,81,79,84,114,116,50,57,51,112,109,45,88,
+    86,55,45,69,87,98,45,84,50,54,45,83,71,115,45,82,104,115,98,45,90,79,77,106,45,80,80,103,
+    48,46,106,112,103,34,125,44,123,34,110,97,109,101,34,58,34,77,68,46,32,78,65,72,73,68,85,76,
+    32,73,83,76,65,77,34,44,34,115,116,117,100,101,110,116,73,100,34,58,34,50,53,48,49,50,49,34,
+    44,34,100,105,115,116,114,105,99,116,34,58,34,80,97,98,110,97,34,44,34,112,101,114,109,97,110,101,
+    110,116,65,100,100,114,101,115,115,34,58,34,83,97,110,116,104,105,97,44,32,80,97,98,110,97,34,44,
+    34,112,104,111,116,111,85,114,108,34,58,34,104,116,116,112,115,58,47,47,105,46,105,98,98,46,99,111,
+    46,99,111,109,47,109,67,84,80,66,119,77,54,47,102,98,99,48,100,56,97,101,45,49,54,100,53,45,
+    52,54,102,99,45,57,51,53,51,45,50,48,54,54,52,53,54,57,53,51,97,100,46,106,112,103,34,125,
+    44,123,34,110,97,109,101,34,58,34,83,97,108,97,117,100,100,105,110,32,65,121,121,117,118,101,34,44,
+    34,115,116,117,100,101,110,116,73,100,34,58,34,50,53,48,49,50,50,34,44,34,100,105,115,116,114,105,
+    99,116,34,58,34,83,105,114,97,106,103,97,110,106,34,44,34,112,101,114,109,97,110,101,110,116,65,100,
+    100,114,101,115,115,34,58,34,83,104,97,106,97,100,112,117,114,44,32,83,105,114,97,106,103,97,110,106,
+    34,44,34,112,104,111,116,111,85,114,108,34,58,34,104,116,116,112,115,58,47,47,105,46,105,98,98,46,
+    99,111,46,99,111,109,47,119,90,102,75,78,115,88,54,47,52,55,55,100,52,50,57,102,100,54,54,100,
+    102,50,51,54,98,97,57,50,97,52,54,50,55,48,101,55,98,57,100,52,46,106,112,103,34,125,44,123,
+    34,110,97,109,101,34,58,34,90,97,104,105,110,32,77,97,104,109,117,100,32,68,97,105,121,97,110,34,
+    44,34,115,116,117,100,101,110,116,73,100,34,58,34,50,53,48,49,50,51,34,44,34,100,105,115,116,114,
+    105,99,116,34,58,34,78,97,116,111,114,101,34,44,34,112,101,114,109,97,110,101,110,116,65,100,100,114,
+    101,115,115,34,58,34,77,111,104,111,110,112,117,114,44,32,78,97,116,111,114,101,34,44,34,112,104,111,
+    116,111,85,114,108,34,58,34,104,116,116,112,115,58,47,47,105,46,105,98,98,46,99,111,46,99,111,109,
+    47,104,82,88,55,84,54,53,67,47,73,77,71,45,51,53,51,56,46,106,112,103,34,125,44,123,34,110,
+    97,109,101,34,58,34,77,115,116,46,32,75,104,97,110,100,97,107,97,114,32,74,97,104,105,100,97,34,
+    44,34,115,116,117,100,101,110,116,73,100,34,58,34,50,53,48,49,50,52,34,44,34,100,105,115,116,114,
+    105,99,116,34,58,34,84,97,110,103,97,105,108,34,44,34,112,101,114,109,97,110,101,110,116,65,100,100,
+    114,101,115,115,34,58,34,80,111,108,97,115,116,111,108,105,44,32,84,97,110,103,97,105,108,34,44,34,
+    112,104,111,116,111,85,114,108,34,58,34,104,116,116,112,115,58,47,47,105,46,105,98,98,46,99,111,46,
+    99,111,109,47,98,82,53,107,83,57,57,57,47,73,77,71,45,54,48,50,49,46,106,112,103,34,125,44,
+    123,34,110,97,109,101,34,58,34,83,72,65,72,73,68,45,72,65,83,65,78,45,70,65,72,73,77,34,
+    44,34,115,116,117,100,101,110,116,73,100,34,58,34,50,53,48,49,50,53,34,44,34,100,105,115,116,114,
+    105,99,116,34,58,34,78,105,108,112,104,97,109,97,114,105,34,44,34,112,101,114,109,97,110,101,110,116,
+    65,100,100,114,101,115,115,34,58,34,78,105,108,112,104,97,109,97,114,105,34,44,34,112,104,111,116,111,
+    85,114,108,34,58,34,104,116,116,112,115,58,47,47,105,46,105,98,98,46,99,111,46,99,111,109,47,89,
+    55,67,53,112,88,68,74,47,73,77,71,45,51,53,51,53,46,106,112,103,34,125,44,123,34,110,97,109,
+    101,34,58,34,70,97,116,101,109,97,34,44,34,115,116,117,100,101,110,116,73,100,34,58,34,50,53,48,
+    49,50,55,34,44,34,100,105,115,116,114,105,99,116,34,58,34,84,97,110,103,97,105,108,34,44,34,112,
+    101,114,109,97,110,101,110,116,65,100,100,114,101,115,115,34,58,34,77,105,114,122,97,112,117,114,44,32,
+    84,97,110,103,97,105,108,34,44,34,112,104,111,116,111,85,114,108,34,58,34,104,116,116,112,115,58,47,
+    47,105,46,105,98,98,46,99,111,46,99,111,109,47,102,100,120,114,110,113,107,110,47,73,77,71,45,51,
+    53,54,53,46,106,112,103,34,125,44,123,34,110,97,109,101,34,58,34,77,115,116,46,32,83,111,104,101,
+    108,105,32,65,107,116,97,114,32,65,107,104,105,34,44,34,115,116,117,100,101,110,116,73,100,34,58,34,
+    50,53,48,49,50,56,34,44,34,100,105,115,116,114,105,99,116,34,58,34,80,97,98,110,97,34,44,34,
+    112,101,114,109,97,110,101,110,116,65,100,100,114,101,115,115,34,58,34,66,101,114,97,44,32,80,97,98,
+    110,97,34,44,34,112,104,111,116,111,85,114,108,34,58,34,104,116,116,112,115,58,47,47,105,46,105,98,
+    98,46,99,111,46,99,111,109,47,109,114,87,48,55,99,99,89,47,73,77,71,45,51,53,53,52,46,106,
+    112,103,34,125,44,123,34,110,97,109,101,34,58,34,75,104,97,110,100,97,107,101,114,32,83,97,105,102,
+    117,108,32,73,115,108,97,109,32,84,97,110,118,105,114,34,44,34,115,116,117,100,101,110,116,73,100,34,
+    58,34,50,53,48,49,51,48,34,44,34,100,105,115,116,114,105,99,116,34,58,34,67,111,109,105,108,108,
+    97,34,44,34,112,101,114,109,97,110,101,110,116,65,100,100,114,101,115,115,34,58,34,77,117,114,97,100,
+    110,97,103,97,114,44,32,67,117,109,105,108,108,97,34,44,34,112,104,111,116,111,85,114,108,34,58,34,
+    104,116,116,112,115,58,47,47,105,46,105,98,98,46,99,111,46,99,111,109,47,53,104,99,53,80,103,118,
+    86,47,73,77,71,45,51,53,51,48,46,106,112,103,34,125,44,123,34,110,97,109,101,34,58,34,77,100,
+    46,32,82,105,121,97,122,32,65,108,105,34,44,34,115,116,117,100,101,110,116,73,100,34,58,34,50,53,
+    48,49,51,50,34,44,34,100,105,115,116,114,105,99,116,34,58,34,82,97,106,115,104,97,104,105,34,44,
+    34,112,101,114,109,97,110,101,110,116,65,100,100,114,101,115,115,34,58,34,82,97,106,115,104,97,104,105,
+    34,44,34,112,104,111,116,111,85,114,108,34,58,34,104,116,116,112,115,58,47,47,105,46,105,98,98,46,
+    99,111,46,99,111,109,47,102,71,77,82,110,115,103,106,47,73,77,71,45,51,53,51,51,46,106,112,103,
+    34,125,44,123,34,110,97,109,101,34,58,34,83,97,104,97,100,97,116,32,72,111,115,115,97,105,110,34,
+    44,34,115,116,117,100,101,110,116,73,100,34,58,34,50,53,48,49,51,51,34,44,34,100,105,115,116,114,
+    105,99,116,34,58,34,78,97,114,115,105,110,103,100,105,34,44,34,112,101,114,109,97,110,101,110,116,65,
+    100,100,114,101,115,115,34,58,34,78,97,114,115,105,110,103,100,105,34,44,34,112,104,111,116,111,85,114,
+    108,34,58,34,104,116,116,112,115,58,47,47,105,46,105,98,98,46,99,111,46,99,111,109,47,83,88,74,
+    83,82,110,98,112,47,73,77,71,45,51,53,56,48,46,106,112,103,34,125,44,123,34,110,97,109,101,34,
+    58,34,74,97,103,111,106,105,116,32,67,104,97,110,100,114,111,32,66,97,114,109,111,110,32,40,78,105,
+    108,111,121,41,34,44,34,115,116,117,100,101,110,116,73,100,34,58,34,50,53,48,49,51,52,34,44,34,
+    100,105,115,116,114,105,99,116,34,58,34,75,117,114,105,103,114,97,109,34,44,34,112,101,114,109,97,110,
+    101,110,116,65,100,100,114,101,115,115,34,58,34,75,117,114,105,103,114,97,109,34,44,34,112,104,111,116,
+    111,85,114,108,34,58,34,104,116,116,112,115,58,47,47,105,46,105,98,98,46,99,111,46,99,111,109,47,
+    77,68,57,104,113,112,50,122,47,56,97,56,102,53,102,50,97,45,101,54,98,51,45,52,51,102,97,45,
+    56,98,56,51,45,49,98,98,54,101,99,98,49,100,99,54,97,46,106,112,103,34,125,44,123,34,110,97,
+    109,101,34,58,34,78,117,114,117,122,122,97,109,97,110,32,78,97,104,105,100,34,44,34,115,116,117,100,
+    101,110,116,73,100,34,58,34,50,53,48,49,51,53,34,44,34,100,105,115,116,114,105,99,116,34,58,34,
+    74,104,101,110,97,105,100,97,104,34,44,34,112,101,114,109,97,110,101,110,116,65,100,100,114,101,115,115,
+    34,58,34,74,104,101,110,97,105,100,97,104,34,44,34,112,104,111,116,111,85,114,108,34,58,34,104,116,
+    116,112,115,58,47,47,105,46,105,98,98,46,99,111,46,99,111,109,47,72,118,116,115,104,112,74,47,73,
+    77,71,45,51,53,56,57,46,106,112,103,34,125,44,123,34,110,97,109,101,34,58,34,83,97,109,101,101,
+    104,97,32,90,97,104,97,110,32,77,114,105,100,117,108,97,34,44,34,115,116,117,100,101,110,116,73,100,
+    34,58,34,50,53,48,49,51,54,34,44,34,100,105,115,116,114,105,99,116,34,58,34,80,97,98,110,97,
+    34,44,34,112,101,114,109,97,110,101,110,116,65,100,100,114,101,115,115,34,58,34,66,101,114,97,40,78,
+    111,114,116,104,41,44,32,80,97,98,110,97,34,44,34,112,104,111,116,111,85,114,108,34,58,34,104,116,
+    116,112,115,58,47,47,105,46,105,98,98,46,99,111,46,99,111,109,47,83,119,57,83,106,122,81,90,47,
+    73,77,71,45,51,53,53,50,46,106,112,103,34,125,44,123,34,110,97,109,101,34,58,34,77,111,104,100,
+    46,32,65,116,105,113,117,122,122,97,109,97,110,32,65,116,105,113,34,44,34,115,116,117,100,101,110,116,
+    73,100,34,58,34,50,53,48,49,51,55,34,44,34,100,105,115,116,114,105,99,116,34,58,34,67,104,97,
+    112,97,105,110,97,119,97,98,103,97,110,106,34,44,34,112,101,114,109,97,110,101,110,116,65,100,100,114,
+    101,115,115,34,58,34,67,104,97,112,97,105,110,97,119,97,98,103,97,110,106,34,44,34,112,104,111,116,
+    111,85,114,108,34,58,34,104,116,116,112,115,58,47,47,105,46,105,98,98,46,99,111,46,99,111,109,47,
+    104,82,90,54,89,114,71,67,47,102,51,97,98,57,57,100,51,45,99,100,98,102,45,52,98,51,57,45,
+    56,48,54,98,45,98,48,101,49,97,97,56,53,57,48,56,56,46,106,112,103,34,125,44,123,34,110,97,
+    109,101,34,58,34,83,97,109,105,110,32,89,101,115,97,114,32,84,111,117,115,105,98,34,44,34,115,116,
+    117,100,101,110,116,73,100,34,58,34,50,53,48,49,51,56,34,44,34,100,105,115,116,114,105,99,116,34,
+    58,34,82,97,110,103,112,117,114,34,44,34,112,101,114,109,97,110,101,110,116,65,100,100,114,101,115,115,
+    34,58,34,71,117,114,97,116,105,112,97,114,97,44,32,82,97,110,103,112,117,114,45,53,52,48,48,34,
+    44,34,112,104,111,116,111,85,114,108,34,58,34,104,116,116,112,115,58,47,47,105,46,105,98,98,46,99,
+    111,46,99,111,109,47,87,112,75,102,51,56,84,102,47,73,77,71,45,51,53,53,48,46,106,112,103,34,
+    125,44,123,34,110,97,109,101,34,58,34,77,100,46,32,73,102,116,101,107,97,114,32,82,97,104,109,97,
+    110,32,40,82,105,97,100,41,34,44,34,115,116,117,100,101,110,116,73,100,34,58,34,50,53,48,49,51,
+    57,34,44,34,100,105,115,116,114,105,99,116,34,58,34,82,97,106,115,104,97,104,105,34,44,34,112,101,
+    114,109,97,110,101,110,116,65,100,100,114,101,115,115,34,58,34,82,97,106,115,104,97,104,105,34,44,34,
+    112,104,111,116,111,85,114,108,34,58,34,104,116,116,112,115,58,47,47,105,46,105,98,98,46,99,111,46,
+    99,111,109,47,120,75,118,106,120,49,49,68,47,73,77,71,45,50,52,53,55,46,106,112,103,34,125,44,
+    123,34,110,97,109,101,34,58,34,65,122,105,122,117,108,32,72,111,113,117,101,32,69,109,111,110,34,44,
+    34,115,116,117,100,101,110,116,73,100,34,58,34,50,53,48,49,52,48,34,44,34,100,105,115,116,114,105,
+    99,116,34,58,34,67,111,120,39,115,32,66,97,122,97,114,34,44,34,112,101,114,109,97,110,101,110,116,
+    65,100,100,114,101,115,115,34,58,34,67,111,120,39,115,32,66,97,122,97,114,34,44,34,112,104,111,116,
+    111,85,114,108,34,58,34,104,116,116,112,115,58,47,47,105,46,105,98,98,46,99,111,46,99,111,109,47,
+    56,68,77,116,103,110,99,90,47,101,56,53,54,48,54,102,54,45,99,50,57,51,45,52,98,57,55,45,
+    57,101,55,100,45,50,100,97,50,50,50,99,55,98,102,48,99,46,106,112,103,34,125,44,123,34,110,97,
+    109,101,34,58,34,77,115,116,46,32,74,111,104,117,114,97,32,75,104,97,116,117,110,34,44,34,115,116,
+    117,100,101,110,116,73,100,34,58,34,50,53,48,49,52,49,34,44,34,100,105,115,116,114,105,99,116,34,
+    58,34,80,97,98,110,97,34,44,34,112,101,114,109,97,110,101,110,116,65,100,100,114,101,115,115,34,58,
+    34,82,97,106,97,112,117,114,44,32,80,97,98,110,97,34,44,34,112,104,111,116,111,85,114,108,34,58,
+    34,104,116,116,112,115,58,47,47,105,46,105,98,98,46,99,111,46,99,111,109,47,54,99,53,74,67,90,
+    122,87,47,73,77,71,45,51,53,57,55,46,106,112,103,34,125,93
+  ]);
+    const districtCoords = decodeAsciiJson([
+    123,34,66,97,103,101,114,104,97,116,34,58,123,34,108,97,116,34,58,50,50,46,54,53,53,51,44,34,
+    108,110,103,34,58,56,57,46,55,56,53,54,125,44,34,66,97,110,100,97,114,98,97,110,34,58,123,34,
+    108,97,116,34,58,50,50,46,49,57,53,50,44,34,108,110,103,34,58,57,50,46,50,49,56,52,125,44,
+    34,66,97,114,103,117,110,97,34,58,123,34,108,97,116,34,58,50,50,46,49,53,51,51,44,34,108,110,
+    103,34,58,57,48,46,49,50,54,53,125,44,34,66,97,114,105,115,104,97,108,34,58,123,34,108,97,116,
+    34,58,50,50,46,55,48,48,50,44,34,108,110,103,34,58,57,48,46,51,54,57,53,125,44,34,66,104,
+    111,108,97,34,58,123,34,108,97,116,34,58,50,50,46,54,56,53,57,44,34,108,110,103,34,58,57,48,
+    46,54,52,56,51,125,44,34,66,111,103,117,114,97,34,58,123,34,108,97,116,34,58,50,52,46,56,52,
+    54,53,44,34,108,110,103,34,58,56,57,46,51,55,55,55,125,44,34,66,114,97,104,109,97,110,98,97,
+    114,105,97,34,58,123,34,108,97,116,34,58,50,51,46,57,53,55,49,44,34,108,110,103,34,58,57,49,
+    46,49,49,49,53,125,44,34,67,104,97,110,100,112,117,114,34,58,123,34,108,97,116,34,58,50,51,46,
+    50,51,51,54,44,34,108,110,103,34,58,57,48,46,54,55,49,52,125,44,34,67,104,97,112,97,105,110,
+    97,119,97,98,103,97,110,106,34,58,123,34,108,97,116,34,58,50,52,46,53,57,54,52,44,34,108,110,
+    103,34,58,56,56,46,50,55,54,52,125,44,34,67,104,97,116,116,111,103,114,97,109,34,58,123,34,108,
+    97,116,34,58,50,50,46,51,53,54,57,44,34,108,110,103,34,58,57,49,46,55,56,51,50,125,44,34,
+    67,104,117,97,100,97,110,103,97,34,58,123,34,108,97,116,34,58,50,51,46,54,51,57,55,44,34,108,
+    110,103,34,58,56,56,46,56,52,48,50,125,44,34,67,111,109,105,108,108,97,34,58,123,34,108,97,116,
+    34,58,50,51,46,52,53,55,54,44,34,108,110,103,34,58,57,49,46,49,56,48,57,125,44,34,67,111,
+    120,39,115,32,66,97,122,97,114,34,58,123,34,108,97,116,34,58,50,49,46,52,50,55,50,44,34,108,
+    110,103,34,58,57,50,46,48,48,53,56,125,44,34,68,104,97,107,97,34,58,123,34,108,97,116,34,58,
+    50,51,46,56,49,48,51,44,34,108,110,103,34,58,57,48,46,52,49,50,53,125,44,34,68,105,110,97,
+    106,112,117,114,34,58,123,34,108,97,116,34,58,50,53,46,54,50,55,57,44,34,108,110,103,34,58,56,
+    56,46,54,51,51,50,125,44,34,70,97,114,105,100,112,117,114,34,58,123,34,108,97,116,34,58,50,51,
+    46,54,48,52,49,44,34,108,110,103,34,58,56,57,46,56,52,50,52,125,44,34,70,101,110,105,34,58,
+    123,34,108,97,116,34,58,50,51,46,48,49,56,56,44,34,108,110,103,34,58,57,49,46,51,57,57,55,
+    125,44,34,71,97,105,98,97,110,100,104,97,34,58,123,34,108,97,116,34,58,50,53,46,51,50,56,52,
+    44,34,108,110,103,34,58,56,57,46,53,52,52,57,125,44,34,71,97,122,105,112,117,114,34,58,123,34,
+    108,97,116,34,58,50,52,46,48,48,50,51,44,34,108,110,103,34,58,57,48,46,52,50,54,52,125,44,
+    34,71,111,112,97,108,103,97,110,106,34,58,123,34,108,97,116,34,58,50,51,46,48,48,57,56,44,34,
+    108,110,103,34,58,56,57,46,56,50,54,49,125,44,34,72,97,98,105,103,97,110,106,34,58,123,34,108,
+    97,116,34,58,50,52,46,51,55,52,53,44,34,108,110,103,34,58,57,49,46,52,49,53,53,125,44,34,
+    74,97,109,97,108,112,117,114,34,58,123,34,108,97,116,34,58,50,52,46,57,51,55,53,44,34,108,110,
+    103,34,58,56,57,46,57,51,55,53,125,44,34,74,97,115,104,111,114,101,34,58,123,34,108,97,116,34,
+    58,50,51,46,49,54,54,49,44,34,108,110,103,34,58,56,57,46,50,48,56,50,125,44,34,74,104,97,
+    108,111,107,97,116,105,34,58,123,34,108,97,116,34,58,50,50,46,54,52,50,50,44,34,108,110,103,34,
+    58,57,48,46,50,48,49,51,125,44,34,74,104,101,110,97,105,100,97,104,34,58,123,34,108,97,116,34,
+    58,50,51,46,53,53,51,50,44,34,108,110,103,34,58,56,57,46,49,55,51,52,125,44,34,74,111,121,
+    112,117,114,104,97,116,34,58,123,34,108,97,116,34,58,50,53,46,48,57,56,50,44,34,108,110,103,34,
+    58,56,57,46,48,50,55,57,125,44,34,75,104,97,103,114,97,99,104,97,114,105,34,58,123,34,108,97,
+    116,34,58,50,51,46,48,52,49,49,44,34,108,110,103,34,58,57,49,46,57,56,52,57,125,44,34,75,
+    104,117,108,110,97,34,58,123,34,108,97,116,34,58,50,50,46,56,52,53,54,44,34,108,110,103,34,58,
+    56,57,46,53,52,48,51,125,44,34,75,105,115,104,111,114,101,103,97,110,106,34,58,123,34,108,97,116,
+    34,58,50,52,46,52,50,56,57,44,34,108,110,103,34,58,57,48,46,55,56,50,50,125,44,34,75,117,
+    114,105,103,114,97,109,34,58,123,34,108,97,116,34,58,50,53,46,56,48,55,50,44,34,108,110,103,34,
+    58,56,57,46,54,52,50,49,125,44,34,75,117,115,104,116,105,97,34,58,123,34,108,97,116,34,58,50,
+    51,46,57,48,49,53,44,34,108,110,103,34,58,56,57,46,49,50,48,55,125,44,34,76,97,107,115,104,
+    109,105,112,117,114,34,58,123,34,108,97,116,34,58,50,50,46,57,52,52,57,44,34,108,110,103,34,58,
+    57,48,46,56,50,56,49,125,44,34,76,97,108,109,111,110,105,114,104,97,116,34,58,123,34,108,97,116,
+    34,58,50,53,46,57,57,52,57,44,34,108,110,103,34,58,56,57,46,50,53,52,56,125,44,34,77,97,
+    100,97,114,105,112,117,114,34,58,123,34,108,97,116,34,58,50,51,46,49,55,50,57,44,34,108,110,103,
+    34,58,57,48,46,50,48,57,50,125,44,34,77,97,103,117,114,97,34,58,123,34,108,97,116,34,58,50,
+    51,46,52,56,55,53,44,34,108,110,103,34,58,56,57,46,52,49,54,125,44,34,77,97,110,105,107,103,
+    97,110,106,34,58,123,34,108,97,116,34,58,50,51,46,56,53,55,49,44,34,108,110,103,34,58,57,48,
+    46,48,48,56,57,125,44,34,77,101,104,101,114,112,117,114,34,58,123,34,108,97,116,34,58,50,51,46,
+    55,53,55,56,44,34,108,110,103,34,58,56,56,46,54,51,51,56,125,44,34,77,111,117,108,118,105,98,
+    97,122,97,114,34,58,123,34,108,97,116,34,58,50,52,46,52,56,50,44,34,108,110,103,34,58,57,49,
+    46,55,55,48,52,125,44,34,77,117,110,115,104,105,103,97,110,106,34,58,123,34,108,97,116,34,58,50,
+    51,46,53,52,50,56,44,34,108,110,103,34,58,57,48,46,53,51,48,51,125,44,34,77,121,109,101,110,
+    115,105,110,103,104,34,58,123,34,108,97,116,34,58,50,52,46,55,53,51,57,44,34,108,110,103,34,58,
+    57,48,46,52,48,55,51,125,44,34,78,97,111,103,97,111,110,34,58,123,34,108,97,116,34,58,50,52,
+    46,56,48,51,53,44,34,108,110,103,34,58,56,56,46,57,52,48,52,125,44,34,78,97,114,97,105,108,
+    34,58,123,34,108,97,116,34,58,50,51,46,49,53,53,50,44,34,108,110,103,34,58,56,57,46,53,48,
+    53,56,125,44,34,78,97,114,97,121,97,110,103,97,110,106,34,58,123,34,108,97,116,34,58,50,51,46,
+    54,51,51,51,44,34,108,110,103,34,58,57,48,46,53,125,44,34,78,97,114,115,105,110,103,100,105,34,
+    58,123,34,108,97,116,34,58,50,51,46,57,51,50,44,34,108,110,103,34,58,57,48,46,55,49,56,56,
+    125,44,34,78,97,116,111,114,101,34,58,123,34,108,97,116,34,58,50,52,46,52,49,49,49,44,34,108,
+    110,103,34,58,56,56,46,57,51,49,56,125,44,34,78,101,116,114,111,107,111,110,97,34,58,123,34,108,
+    97,116,34,58,50,52,46,56,56,50,53,44,34,108,110,103,34,58,57,48,46,55,50,54,52,125,44,34,
+    78,105,108,112,104,97,109,97,114,105,34,58,123,34,108,97,116,34,58,50,53,46,57,51,49,57,44,34,
+    108,110,103,34,58,56,56,46,56,53,52,49,125,44,34,78,111,97,107,104,97,108,105,34,58,123,34,108,
+    97,116,34,58,50,50,46,56,50,52,53,44,34,108,110,103,34,58,57,49,46,48,57,56,52,125,44,34,
+    80,97,98,110,97,34,58,123,34,108,97,116,34,58,50,52,46,48,48,54,52,44,34,108,110,103,34,58,
+    56,57,46,50,52,57,57,125,44,34,80,97,110,99,104,97,103,97,114,104,34,58,123,34,108,97,116,34,
+    58,50,54,46,51,49,50,51,44,34,108,110,103,34,58,56,56,46,53,53,56,54,125,44,34,80,97,116,
+    117,97,107,104,97,108,105,34,58,123,34,108,97,116,34,58,50,50,46,51,53,52,54,44,34,108,110,103,
+    34,58,57,48,46,51,48,51,56,125,44,34,80,105,114,111,106,112,117,114,34,58,123,34,108,97,116,34,
+    58,50,50,46,53,56,52,44,34,108,110,103,34,58,56,57,46,57,55,53,125,44,34,82,97,106,98,97,
+    114,105,34,58,123,34,108,97,116,34,58,50,51,46,55,53,55,53,44,34,108,110,103,34,58,56,57,46,
+    54,52,52,53,125,44,34,82,97,106,115,104,97,104,105,34,58,123,34,108,97,116,34,58,50,52,46,51,
+    55,52,53,44,34,108,110,103,34,58,56,56,46,54,48,52,50,125,44,34,82,97,110,103,97,109,97,116,
+    105,34,58,123,34,108,97,116,34,58,50,50,46,54,51,51,51,44,34,108,110,103,34,58,57,50,46,50,
+    125,44,34,82,97,110,103,112,117,114,34,58,123,34,108,97,116,34,58,50,53,46,55,52,57,54,44,34,
+    108,110,103,34,58,56,57,46,50,52,55,52,125,44,34,83,97,116,107,104,105,114,97,34,58,123,34,108,
+    97,116,34,58,50,50,46,55,48,52,53,44,34,108,110,103,34,58,56,57,46,48,55,50,51,125,44,34,
+    83,104,97,114,105,97,116,112,117,114,34,58,123,34,108,97,116,34,58,50,51,46,50,48,54,56,44,34,
+    108,110,103,34,58,57,48,46,51,52,55,55,125,44,34,83,104,101,114,112,117,114,34,58,123,34,108,97,
+    116,34,58,50,53,46,48,49,57,52,44,34,108,110,103,34,58,57,48,46,48,49,53,51,125,44,34,83,
+    105,114,97,106,103,97,110,106,34,58,123,34,108,97,116,34,58,50,52,46,52,53,51,57,44,34,108,110,
+    103,34,58,56,57,46,55,48,53,125,44,34,83,117,110,97,109,103,97,110,106,34,58,123,34,108,97,116,
+    34,58,50,53,46,48,54,52,56,44,34,108,110,103,34,58,57,49,46,51,57,52,54,125,44,34,83,121,
+    108,104,101,116,34,58,123,34,108,97,116,34,58,50,52,46,56,57,52,57,44,34,108,110,103,34,58,57,
+    49,46,56,54,56,55,125,44,34,84,97,110,103,97,105,108,34,58,123,34,108,97,116,34,58,50,52,46,
+    50,52,57,51,44,34,108,110,103,34,58,56,57,46,57,49,54,53,125,44,34,84,104,97,107,117,114,103,
+    97,111,110,34,58,123,34,108,97,116,34,58,50,54,46,48,51,51,56,44,34,108,110,103,34,58,56,56,
+    46,52,54,57,56,125,44,34,67,117,109,105,108,108,97,34,58,123,34,108,97,116,34,58,50,51,46,52,
+    53,55,54,44,34,108,110,103,34,58,57,49,46,49,56,48,57,125,44,34,74,101,115,115,111,114,101,34,
+    58,123,34,108,97,116,34,58,50,51,46,49,54,54,49,44,34,108,110,103,34,58,56,57,46,50,48,56,
+    50,125,125
+  ]);
+
+    // Address-level coordinates: student marker will use permanentAddress first.
+    // If an address coordinate is missing, it will safely fall back to district coordinate.
+    const addressCoords = decodeAsciiJson([
+    123,34,77,117,106,97,104,105,100,32,67,108,117,98,44,32,80,97,98,110,97,34,58,123,34,108,97,116,
+    34,58,50,52,46,48,48,54,54,44,34,108,110,103,34,58,56,57,46,50,51,55,50,125,44,34,83,104,
+    97,114,105,97,107,97,110,100,105,44,32,66,111,103,117,114,97,34,58,123,34,108,97,116,34,58,50,52,
+    46,56,56,54,55,44,34,108,110,103,34,58,56,57,46,53,55,56,49,125,44,34,80,97,105,107,103,97,
+    99,104,97,44,32,75,104,117,108,110,97,34,58,123,34,108,97,116,34,58,50,50,46,53,57,52,54,44,
+    34,108,110,103,34,58,56,57,46,51,51,53,54,125,44,34,78,105,97,109,97,116,112,117,114,44,32,78,
+    97,111,103,97,111,110,34,58,123,34,108,97,116,34,58,50,52,46,56,51,51,52,44,34,108,110,103,34,
+    58,56,56,46,53,54,54,55,125,44,34,77,111,104,97,100,101,118,112,117,114,44,32,78,97,111,103,97,
+    111,110,34,58,123,34,108,97,116,34,58,50,52,46,57,49,53,55,44,34,108,110,103,34,58,56,56,46,
+    55,52,56,57,125,44,34,82,97,110,105,110,97,103,97,114,44,32,78,97,111,103,97,111,110,34,58,123,
+    34,108,97,116,34,58,50,52,46,55,51,57,50,44,34,108,110,103,34,58,56,56,46,57,54,55,55,125,
+    44,34,68,104,97,107,97,34,58,123,34,108,97,116,34,58,50,51,46,56,49,48,51,44,34,108,110,103,
+    34,58,57,48,46,52,49,50,53,125,44,34,66,105,114,97,109,112,117,114,44,32,68,105,110,97,106,112,
+    117,114,34,58,123,34,108,97,116,34,58,50,53,46,51,56,57,57,44,34,108,110,103,34,58,56,56,46,
+    57,57,48,51,125,44,34,84,97,110,103,97,105,108,34,58,123,34,108,97,116,34,58,50,52,46,50,52,
+    57,51,44,34,108,110,103,34,58,56,57,46,57,49,54,53,125,44,34,78,97,111,103,97,111,110,34,58,
+    123,34,108,97,116,34,58,50,52,46,56,48,51,53,44,34,108,110,103,34,58,56,56,46,57,52,48,52,
+    125,44,34,68,105,110,97,106,112,117,114,34,58,123,34,108,97,116,34,58,50,53,46,54,50,55,57,44,
+    34,108,110,103,34,58,56,56,46,54,51,51,50,125,44,34,74,97,115,104,111,114,101,34,58,123,34,108,
+    97,116,34,58,50,51,46,49,54,54,49,44,34,108,110,103,34,58,56,57,46,50,48,56,50,125,44,34,
+    71,97,122,105,112,117,114,32,83,97,100,97,114,44,32,71,97,122,105,112,117,114,34,58,123,34,108,97,
+    116,34,58,50,52,46,48,48,50,51,44,34,108,110,103,34,58,57,48,46,52,50,54,52,125,44,34,84,
+    104,97,107,117,114,103,97,111,110,34,58,123,34,108,97,116,34,58,50,54,46,48,51,51,56,44,34,108,
+    110,103,34,58,56,56,46,52,54,57,56,125,44,34,78,97,108,100,97,110,103,97,44,32,78,97,116,111,
+    114,101,34,58,123,34,108,97,116,34,58,50,52,46,52,48,57,54,44,34,108,110,103,34,58,56,57,46,
+    48,49,49,52,125,44,34,71,111,100,97,103,97,114,105,44,32,82,97,106,115,104,97,104,105,34,58,123,
+    34,108,97,116,34,58,50,52,46,52,54,54,55,44,34,108,110,103,34,58,56,56,46,51,51,51,51,125,
+    44,34,83,105,114,97,106,103,97,110,106,34,58,123,34,108,97,116,34,58,50,52,46,52,53,51,57,44,
+    34,108,110,103,34,58,56,57,46,55,48,53,125,44,34,83,104,97,106,97,100,112,117,114,44,32,83,105,
+    114,97,106,103,97,110,106,34,58,123,34,108,97,116,34,58,50,52,46,49,55,54,57,44,34,108,110,103,
+    34,58,56,57,46,53,57,56,54,125,44,34,77,111,104,111,110,112,117,114,44,32,78,97,116,111,114,101,
+    34,58,123,34,108,97,116,34,58,50,52,46,52,49,49,49,44,34,108,110,103,34,58,56,56,46,57,51,
+    49,56,125,44,34,80,111,108,97,115,116,111,108,105,44,32,84,97,110,103,97,105,108,34,58,123,34,108,
+    97,116,34,58,50,52,46,50,52,57,51,44,34,108,110,103,34,58,56,57,46,57,49,54,53,125,44,34,
+    78,105,108,112,104,97,109,97,114,105,34,58,123,34,108,97,116,34,58,50,53,46,57,51,49,57,44,34,
+    108,110,103,34,58,56,56,46,56,53,52,49,125,44,34,77,105,114,122,97,112,117,114,44,32,84,97,110,
+    103,97,105,108,34,58,123,34,108,97,116,34,58,50,52,46,49,48,50,49,44,34,108,110,103,34,58,57,
+    48,46,48,57,56,57,125,44,34,66,101,114,97,44,32,80,97,98,110,97,34,58,123,34,108,97,116,34,
+    58,50,52,46,48,55,56,57,44,34,108,110,103,34,58,56,57,46,54,51,50,56,125,44,34,77,117,114,
+    97,100,110,97,103,97,114,44,32,67,117,109,105,108,108,97,34,58,123,34,108,97,116,34,58,50,51,46,
+    54,53,51,50,44,34,108,110,103,34,58,57,48,46,57,51,52,56,125,44,34,82,97,106,115,104,97,104,
+    105,34,58,123,34,108,97,116,34,58,50,52,46,51,55,52,53,44,34,108,110,103,34,58,56,56,46,54,
+    48,52,50,125,44,34,78,97,114,115,105,110,103,100,105,34,58,123,34,108,97,116,34,58,50,51,46,57,
+    51,50,44,34,108,110,103,34,58,57,48,46,55,49,56,56,125,44,34,75,117,114,105,103,114,97,109,34,
+    58,123,34,108,97,116,34,58,50,53,46,56,48,55,50,44,34,108,110,103,34,58,56,57,46,54,52,50,
+    49,125,44,34,74,104,101,110,97,105,100,97,104,34,58,123,34,108,97,116,34,58,50,51,46,53,53,51,
+    50,44,34,108,110,103,34,58,56,57,46,49,55,51,52,125,44,34,67,104,97,112,97,105,110,97,119,97,
+    98,103,97,110,106,34,58,123,34,108,97,116,34,58,50,52,46,53,57,54,52,44,34,108,110,103,34,58,
+    56,56,46,50,55,54,52,125,44,34,71,117,114,97,116,105,112,97,114,97,44,32,82,97,110,103,112,117,
+    114,45,53,52,48,48,34,58,123,34,108,97,116,34,58,50,53,46,55,52,57,54,44,34,108,110,103,34,
+    58,56,57,46,50,52,55,52,125,44,34,67,111,120,39,115,32,66,97,122,97,114,34,58,123,34,108,97,
+    116,34,58,50,49,46,52,50,55,50,44,34,108,110,103,34,58,57,50,46,48,48,53,56,125,44,34,66,
+    101,114,97,40,78,111,114,116,104,41,44,32,80,97,98,110,97,34,58,123,34,108,97,116,34,58,50,52,
+    46,48,57,53,44,34,108,110,103,34,58,56,57,46,54,51,53,125,44,34,82,97,106,97,112,117,114,44,
+    32,80,97,98,110,97,34,58,123,34,108,97,116,34,58,50,52,46,48,48,54,52,44,34,108,110,103,34,
+    58,56,57,46,50,52,57,57,125,44,34,83,97,110,116,104,105,97,44,32,80,97,98,110,97,34,58,123,
+    34,108,97,116,34,58,50,52,46,48,53,56,44,34,108,110,103,34,58,56,57,46,53,52,125,125
+  ]);
+
+    const fallbackPhoto = "https://randomuser.me/api/portraits/lego/1.jpg";
+
+    const map = L.map('bangladesh-map', { zoomControl: true, preferCanvas: true }).setView([23.685, 90.356], 7.85);
+    map.createPane('districtBordersPane');
+    map.getPane('districtBordersPane').style.zIndex = 360;
+    map.createPane('districtLabelsPane');
+    map.getPane('districtLabelsPane').style.zIndex = 650;
+    map.createPane('studentMarkersPane');
+    map.getPane('studentMarkersPane').style.zIndex = 720;
+
+    const districtGeoJsonUrl = 'https://raw.githubusercontent.com/wmgeolab/geoBoundaries/905b0ba/releaseData/gbOpen/BGD/ADM2/geoBoundaries-BGD-ADM2_simplified.geojson';
+    let districtBoundaryLayer = null;
+    let districtLabelLayer = L.layerGroup([], { pane: 'districtLabelsPane' }).addTo(map);
+
+    function normalizeDistrictName(name) {
+      return String(name || '')
+        .toLowerCase()
+        .replace(/district|zilla|zila|jela/g, '')
+        .replace(/[^a-z]/g, '');
+    }
+
+    function displayDistrictName(name) {
+      const aliases = decodeAsciiJson([
+    123,34,99,111,109,105,108,108,97,34,58,34,67,117,109,105,108,108,97,34,44,34,99,117,109,105,108,108,
+    97,34,58,34,67,117,109,105,108,108,97,34,44,34,106,101,115,115,111,114,101,34,58,34,74,97,115,104,
+    111,114,101,34,44,34,106,97,115,104,111,114,101,34,58,34,74,97,115,104,111,114,101,34,44,34,99,104,
+    97,112,97,105,34,58,34,67,104,97,112,97,105,110,97,119,97,98,103,97,110,106,34,44,34,110,97,119,
+    97,98,103,97,110,106,34,58,34,67,104,97,112,97,105,110,97,119,97,98,103,97,110,106,34,44,34,99,
+    104,97,112,97,105,110,97,119,97,98,103,97,110,106,34,58,34,67,104,97,112,97,105,110,97,119,97,98,
+    103,97,110,106,34,44,34,99,111,120,115,98,97,122,97,114,34,58,34,67,111,120,39,115,32,66,97,122,
+    97,114,34,125
+  ]);
+      return aliases[normalizeDistrictName(name)] || name;
+    }
+
+
+    function getStudentCoord(student) {
+      const addressKey = String(student.permanentAddress || '').trim();
+      const districtKey = String(student.district || '').trim();
+      return addressCoords[addressKey] || districtCoords[districtKey] || districtCoords[displayDistrictName(districtKey)];
+    }
+
+    function coordKey(coord) {
+      if (!coord) return 'missing';
+      return `${Number(coord.lat).toFixed(5)},${Number(coord.lng).toFixed(5)}`;
+    }
+
+    function studentDistrictStats(list = studentsData) {
+      const stats = {};
+      list.forEach(s => {
+        const key = normalizeDistrictName(s.district);
+        if (!stats[key]) stats[key] = { district: s.district, count: 0, names: [] };
+        stats[key].count += 1;
+        stats[key].names.push(`${s.name} (${s.studentId})`);
+      });
+      return stats;
+    }
+
+    function getFeatureDistrictName(feature) {
+      const p = feature.properties || {};
+      return p.shapeName || p.shapename || p.ADM2_EN || p.NAME_2 || p.name || p.Name || p.district || p.DISTRICT || 'District';
+    }
+
+    function districtStyle(feature) {
+      const name = getFeatureDistrictName(feature);
+      const stats = studentDistrictStats()[normalizeDistrictName(name)];
+      const hasStudents = Boolean(stats);
+      return {
+        pane: 'districtBordersPane',
+        color: hasStudents ? '#002f1b' : '#123d2b',
+        weight: hasStudents ? 3.4 : 1.8,
+        opacity: hasStudents ? 1 : .92,
+        fillColor: hasStudents ? '#c99400' : '#6f9f8d',
+        fillOpacity: hasStudents ? .38 : .18,
+        dashArray: hasStudents ? null : '4,5'
+      };
+    }
+
+    function refreshDistrictLabels(list = studentsData) {
+      districtLabelLayer.clearLayers();
+      const stats = studentDistrictStats(list);
+      Object.values(stats).forEach(item => {
+        const coord = districtCoords[item.district] || districtCoords[displayDistrictName(item.district)];
+        if (!coord) return;
+        const label = L.marker([coord.lat, coord.lng], {
+          pane: 'districtLabelsPane',
+          interactive: true,
+          icon: L.divIcon({
+            className: 'district-label-wrapper',
+            html: `<div class="home-district-label">📍 ${escapeHtml(displayDistrictName(item.district))}<span class="count">${item.count}</span></div>`,
+            iconSize: [100, 22],
+            iconAnchor: [50, 11]
+          })
+        }).bindTooltip(`<b>${escapeHtml(displayDistrictName(item.district))}</b><br>${item.names.map(escapeHtml).join('<br>')}`, {
+          direction: 'top',
+          opacity: .98,
+          sticky: true,
+          className: 'district-name-tooltip'
+        });
+        districtLabelLayer.addLayer(label);
+      });
+    }
+
+    function loadDistrictBorders() {
+      fetch(districtGeoJsonUrl)
+        .then(res => res.json())
+        .then(data => {
+          districtBoundaryLayer = L.geoJSON(data, {
+            pane: 'districtBordersPane',
+            style: districtStyle,
+            onEachFeature: (feature, layer) => {
+              const name = getFeatureDistrictName(feature);
+              const stats = studentDistrictStats()[normalizeDistrictName(name)];
+              const title = stats
+                ? `<b>${escapeHtml(displayDistrictName(name))}</b><br>Students: ${stats.count}<br>${stats.names.map(escapeHtml).join('<br>')}`
+                : `<b>${escapeHtml(displayDistrictName(name))}</b>`;
+              layer.bindTooltip(title, { sticky: true, className: 'district-name-tooltip' });
+              layer.on({
+                mouseover: e => e.target.setStyle({ weight: 4.2, fillOpacity: .34, color: '#001f12' }),
+                mouseout: e => districtBoundaryLayer && districtBoundaryLayer.resetStyle(e.target)
+              });
+            }
+          }).addTo(map);
+          districtBoundaryLayer.bringToBack();
+          refreshDistrictLabels(studentsData);
+        })
+        .catch(() => {
+          console.warn('District boundary GeoJSON could not be loaded. Labels and student markers will still work.');
+          refreshDistrictLabels(studentsData);
+        });
+    }
+
+    L.tileLayer('https://{s}.basemaps.cartocdn.com/light_all/{z}/{x}/{y}{r}.png', {
+      attribution: '© <a href="https://www.openstreetmap.org/copyright">OSM</a> © CartoDB',
+      subdomains: 'abcd',
+      maxZoom: 12,
+      minZoom: 6
+    }).addTo(map);
+
+    const markerMap = new Map();
+    const bounds = [];
+    let selectedMarker = null;
+    let activeStudentId = null;
+    function clearSelectedMarker() {
+      if (!selectedMarker) return;
+      const el = selectedMarker.getElement();
+      if (el) {
+        const card = el.querySelector('.student-marker-card');
+        if (card) card.classList.remove('selected');
+      }
+      selectedMarker.setZIndexOffset(500);
+      selectedMarker = null;
+    }
+    function showStudentDetail(student) {
+      // Disabled: no bottom notification/detail panel. The clicked student's info appears only in the map popup.
+      return;
+    }
+
+    function closeStudentDetail() {
+      activeStudentId = null;
+      map.closePopup();
+      clearSelectedMarker();
+    }
+    window.closeStudentDetail = closeStudentDetail;
+    function focusStudent(student, marker, zoom = 10.2) {
+      if (!marker) return;
+
+      // Make sure any previously opened popup/tooltip is removed first.
+      // This keeps only the clicked student's popup visible.
+      map.closePopup();
+      markerMap.forEach(m => {
+        if (m !== marker) {
+          m.closePopup();
+          m.closeTooltip();
+          m.setZIndexOffset(500);
+          const otherEl = m.getElement();
+          if (otherEl) {
+            const otherCard = otherEl.querySelector('.student-marker-card');
+            if (otherCard) otherCard.classList.remove('selected');
+          }
+        }
+      });
+
+      clearSelectedMarker();
+      activeStudentId = student.studentId;
+      selectedMarker = marker;
+      const latlng = marker.getLatLng();
+      map.setView(latlng, zoom, { animate: true });
+      marker.setZIndexOffset(10000);
+      const el = marker.getElement();
+      if (el) {
+        const card = el.querySelector('.student-marker-card');
+        if (card) card.classList.add('selected');
+      }
+      // Open only the clicked student's popup. If another student is clicked quickly,
+      // this delayed popup will be skipped.
+      setTimeout(() => {
+        if (activeStudentId === student.studentId) marker.openPopup();
+      }, 220);
+    }
+
+    function escapeHtml(str) {
+      return String(str || '').replace(/[&<>"']/g, m => ({
+        '&': '&amp;', '<': '&lt;', '>': '&gt;', '"': '&quot;', "'": '&#039;'
+      }[m]));
+    }
+    function initials(name) {
+      return String(name || '?').trim().split(/\s+/).slice(0,2).map(w => w[0]).join('').toUpperCase() || '?';
+    }
+    function hasPhoto(url) { return /^https?:\/\//i.test(String(url || '').trim()); }
+    function offsetLatLng(lat, lng, index, total) {
+      if (total <= 1) return [lat, lng];
+      const ring = Math.floor(index / 8) + 1;
+      const angle = (index % 8) * (Math.PI * 2 / Math.min(total, 8));
+      const radius = 0.105 * ring;
+      return [lat + Math.sin(angle) * radius, lng + Math.cos(angle) * radius];
+    }
+    function markerHtml(student) {
+      const safeName = escapeHtml(student.name);
+      const safeDistrict = escapeHtml(student.district);
+      const photo = hasPhoto(student.photoUrl)
+        ? `<img class="marker-photo" src="${escapeHtml(student.photoUrl)}" alt="${safeName}" onerror="this.replaceWith(makeInitialsNode('${escapeHtml(initials(student.name))}','marker-initials'))">`
+        : `<div class="marker-initials">${escapeHtml(initials(student.name))}</div>`;
+      return `<div class="student-marker-card" title="${safeName} — ${safeDistrict}">${photo}</div>`;
+    }
+    function popupHtml(student) {
+      const photo = hasPhoto(student.photoUrl)
+        ? `<img src="${escapeHtml(student.photoUrl)}" alt="${escapeHtml(student.name)}" onerror="this.style.display='none'">`
+        : `<div class="popup-initials">${escapeHtml(initials(student.name))}</div>`;
+      return `<div class="popup-card">${photo}<div class="popup-name">${escapeHtml(student.name)}</div><div class="popup-meta">ID: ${escapeHtml(student.studentId)}</div><div class="popup-meta">District: <b>${escapeHtml(student.district)}</b></div><div class="popup-meta">Address: ${escapeHtml(student.permanentAddress)}</div></div>`;
+    }
+    function makeInitialsNode(text, cls) {
+      const div = document.createElement('div');
+      div.className = cls;
+      div.textContent = text || '?';
+      return div;
+    }
+    window.makeInitialsNode = makeInitialsNode;
+
+    function renderMarkers(list) {
+      closeStudentDetail();
+      markerMap.forEach(marker => map.removeLayer(marker));
+      markerMap.clear();
+      bounds.length = 0;
+
+      const locationCounts = {};
+      list.forEach(s => {
+        const coord = getStudentCoord(s);
+        if (!coord) return;
+        const key = coordKey(coord);
+        locationCounts[key] = (locationCounts[key] || 0) + 1;
+      });
+      const locationIndex = {};
+
+      list.forEach(student => {
+        const coord = getStudentCoord(student);
+        if (!coord) return;
+        const key = coordKey(coord);
+        const idx = locationIndex[key] || 0;
+        locationIndex[key] = idx + 1;
+        const [lat, lng] = offsetLatLng(coord.lat, coord.lng, idx, locationCounts[key]);
+        const icon = L.divIcon({
+          className: 'custom-div-icon',
+          html: markerHtml(student),
+          iconSize: [38, 38],
+          iconAnchor: [19, 19],
+          popupAnchor: [0, -22]
+        });
+        const marker = L.marker([lat, lng], { icon, riseOnHover: true, pane: 'studentMarkersPane', zIndexOffset: 500 }).addTo(map);
+        marker.bindPopup(popupHtml(student), { autoPan: true, keepInView: true, minWidth: 240, maxWidth: 300, closeButton: true, autoClose: true, closeOnClick: true, className: 'student-popup-only' });
+        marker.bindTooltip(`${student.name} — ${student.permanentAddress}`, { sticky: true, offset: [0, -18], direction: 'top' });
+        marker.on('click', (e) => { if (e && e.originalEvent) L.DomEvent.stopPropagation(e.originalEvent); focusStudent(student, marker); });
+        markerMap.set(student.studentId, marker);
+        bounds.push([lat, lng]);
+      });
+      refreshDistrictLabels(list);
+      if (districtBoundaryLayer) districtBoundaryLayer.setStyle(districtStyle);
+    }
+
+    function renderStudentList(list) {
+      const box = document.getElementById('studentList');
+      box.innerHTML = '';
+      list.forEach(student => {
+        const row = document.createElement('div');
+        row.className = 'student-row';
+        const photo = hasPhoto(student.photoUrl)
+          ? `<img src="${escapeHtml(student.photoUrl)}" alt="${escapeHtml(student.name)}" onerror="this.replaceWith(makeInitialsNode('${escapeHtml(initials(student.name))}','initials-small'))">`
+          : `<div class="initials-small">${escapeHtml(initials(student.name))}</div>`;
+        row.innerHTML = `${photo}<div><div class="row-name">${escapeHtml(student.name)}</div><div class="row-meta">ID: ${escapeHtml(student.studentId)} • ${escapeHtml(student.district)}</div></div>`;
+        row.addEventListener('click', () => {
+          const marker = markerMap.get(student.studentId);
+          if (marker) {
+            focusStudent(student, marker, 10.2);
+          }
+        });
+        box.appendChild(row);
+      });
+    }
+
+    function applyFilter() {
+      const q = document.getElementById('searchBox').value.toLowerCase().trim();
+      const filtered = studentsData.filter(s =>
+        s.name.toLowerCase().includes(q) ||
+        s.studentId.toLowerCase().includes(q) ||
+        s.district.toLowerCase().includes(q) ||
+        s.permanentAddress.toLowerCase().includes(q)
+      );
+      renderMarkers(filtered);
+      renderStudentList(filtered);
+    }
+
+    document.getElementById('totalStudents').textContent = studentsData.length;
+    document.getElementById('totalDistricts').textContent = new Set(studentsData.map(s => s.district)).size;
+    document.getElementById('searchBox').addEventListener('input', applyFilter);
+    map.on('click', () => closeStudentDetail());
+    loadDistrictBorders();
+
+    applyFilter();
+    setTimeout(() => {
+      map.invalidateSize();
+      if (bounds.length) {
+        map.fitBounds(bounds, { padding: [35, 35], maxZoom: 8.35 });
+        setTimeout(() => {
+          const currentZoom = map.getZoom();
+          map.setZoom(Math.min(currentZoom + 0.55, 8.35), { animate: true });
+        }, 180);
+      }
+    }, 250);
+  </script>
+</body>
+</html>
