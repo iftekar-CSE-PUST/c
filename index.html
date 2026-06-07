@@ -76,7 +76,7 @@
         .admin-header .header-actions {
             display: flex;
             align-items: center;
-            gap: 12px;
+            gap: 8px;
         }
         .admin-user {
             display: flex;
@@ -355,23 +355,35 @@
 
         .mobile-menu-btn {
             display: none;
-            background: rgba(255,255,255,0.12);
+            background: rgba(255,255,255,0.15);
             border: none;
             color: white;
-            font-size: 1.35em;
-            width: 42px;
-            height: 42px;
-            border-radius: 50%;
+            font-size: 1.4em;
+            width: 44px;
+            height: 44px;
+            border-radius: 12px;
             align-items: center;
             justify-content: center;
             cursor: pointer;
-            margin-left: 10px;
+            margin-left: 8px;
             flex-shrink: 0;
+            transition: all 0.2s ease;
+        }
+        
+        .mobile-menu-btn:active {
+            background: rgba(255,255,255,0.25);
+            transform: scale(0.95);
         }
         
         @media (max-width: 1024px) {
             .mobile-menu-btn {
                 display: flex !important;
+                visibility: visible !important;
+                opacity: 1 !important;
+            }
+            
+            .admin-header .header-actions {
+                gap: 8px;
             }
         }
 
